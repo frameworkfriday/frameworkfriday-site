@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/decision-sprint",
+      "destination": "https://start.frameworkfriday.ai",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
