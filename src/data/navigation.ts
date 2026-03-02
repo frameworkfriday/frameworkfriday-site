@@ -1,6 +1,6 @@
 export const navLinks = [
   { label: "Decision Sprint", href: "https://start.frameworkfriday.ai", external: true },
-  { label: "Academy", href: "/academy", external: false },
+  { label: "Academy", href: "https://start.frameworkfriday.ai/academy-home", external: true },
   { label: "Forum", href: "/forum", external: false },
   { label: "About", href: "/about", external: false },
   { label: "Resources", href: "/resources", external: false },
@@ -9,7 +9,7 @@ export const navLinks = [
 export const footerLinks = {
   products: [
     { label: "Decision Sprint", href: "https://start.frameworkfriday.ai", external: true },
-    { label: "Academy", href: "/academy", external: false },
+    { label: "Academy", href: "https://start.frameworkfriday.ai/academy-home", external: true },
     { label: "Forum", href: "/forum", external: false },
   ],
   company: [
