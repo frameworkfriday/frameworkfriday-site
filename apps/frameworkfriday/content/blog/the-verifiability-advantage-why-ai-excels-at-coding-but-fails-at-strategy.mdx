@@ -1,0 +1,244 @@
+---
+title: "The Verifiability Advantage: Why AI Excels at Coding but Fails at Strategy"
+excerpt: "A July 2025 study found AI made experienced developers 19% slower. Understanding verifiability explains both that finding and where AI actually delivers measurable returns."
+category: "General"
+author: "Friday Signal Team"
+publishedAt: "2025-12-11"
+featuredImage: "https://vxrbpcjyfgqeadqpbjxq.supabase.co/storage/v1/object/public/blog-images/blog/1765451486604-56tbsenmq3d.png"
+---
+
+A July 2025 study found AI made experienced developers 19% slower. Understanding verifiability explains both that finding and where AI actually delivers measurable returns.
+
+METR ran a randomized controlled trial with 16 experienced open-source developers in July 2025. Each developer completed 246 tasks in mature projects where they had an average of 5 years of prior experience. Tasks were randomly assigned to allow or disallow AI tools-primarily Cursor Pro with Claude 3.5/3.7 Sonnet.
+
+Developers predicted AI would reduce completion time by 24%. After completing the study, they estimated AI reduced time by 20%. The actual measured impact: **AI increased completion time by 19%**. The tools made developers slower, not faster.
+
+This result contradicts the widespread narrative that AI boosts developer productivity. It also contradicts the 41% of code now being AI-generated and GitHub reporting 30% acceptance rates for Copilot suggestions. Something doesn't align.
+
+The explanation isn't that AI is useless for development. The explanation is that **task verifiability determines AI performance**, and most people misunderstand which tasks are high-verifiability versus low-verifiability.
+
+## What Verifiability Actually Means
+
+Verifiability means immediate, objective feedback on whether output is correct.
+
+Examples of **high-verifiability** tasks:
+
+- Code that passes tests is verifiably correct.
+- Code that follows style guidelines is verifiably compliant.
+- Document formatting that matches specifications is verifiably accurate.
+
+These are the tasks where AI can self-correct through iteration.
+
+The 2024 DORA report found speed and stability decreased due to AI. Developer surveys show 85% now use AI tools regularly, with 62% relying on at least one AI coding assistant. Yet 66% of developers report current metrics don't reflect their true contributions, and only 30% of GitHub Copilot suggestions get accepted.
+
+Here's what's happening: AI generates code quickly. That code requires more review, debugging, and revision than human-written code because AI doesn't understand project context, architecture decisions, or implicit requirements. The time saved on initial generation gets consumed by validation and correction.
+
+This primarily applies to **complex, production codebases** where verification requires deep context-exactly the scenario METR tested. For simpler tasks like generating boilerplate code, writing documentation, or creating test cases, AI delivers genuine productivity gains.
+
+The difference is verifiability.
+
+## Three Verifiability Categories for Business Tasks
+
+Classify your tasks into three buckets:
+
+### 1. High-Verifiability
+
+Immediate feedback loops that objectively show correctness.
+
+Examples:
+
+- Code that passes comprehensive test suites
+- Data analysis with quantifiable metrics and known ground truth
+- Document formatting matching strict style guides
+- Translation accuracy verified against source material
+
+### 2. Medium-Verifiability
+
+Delayed or subjective feedback requiring human judgment.
+
+Examples:
+
+- Creative strategy where success appears over weeks or months
+- Nuanced communication where effectiveness depends on relationship context
+- Project planning where quality emerges only during execution
+
+### 3. Low-Verifiability
+
+No clear, objective correctness measure.
+
+Examples:
+
+- Judgment calls balancing competing priorities
+- Creative work evaluated on aesthetic or emotional criteria
+- Strategic decisions with long-term, multifaceted outcomes
+
+## How AI Performance Tracks Verifiability
+
+AI performance correlates directly with verifiability:
+
+**High-verifiability tasks**
+
+- Often see **30-60% time savings**
+- AI can iterate until output passes clear verification
+
+**Medium-verifiability tasks**
+
+- See minimal gains
+- AI can't self-correct without human feedback
+- Outputs still need human judgment before use
+
+**Low-verifiability tasks**
+
+- Often see **negative productivity**
+- AI produces plausible-sounding output
+- Humans must spend extensive time evaluating subtle flaws
+
+Your task-to-model matching methodology needs **verifiability scoring**.
+
+For each workflow, ask:
+
+> How quickly can we determine if this output is correct?
+
+- If the answer is **"immediately with objective tests"**, deploy AI with minimal oversight.
+- If the answer is **"after weeks of real-world results"**, keep full human ownership.
+
+## Rollout Strategy: Start Where AI Can Actually Win
+
+The phased rollout strategy starts with high-verifiability quick wins.
+
+### Phase 1: High-Verifiability Tasks
+
+Implement AI for:
+
+- Code generation with comprehensive test coverage
+- Automated data analysis where metrics validate accuracy
+- Document formatting where style guides provide clear standards
+
+These should show measurable impact within **2-4 weeks**.
+
+### Phase 2: Medium-Verifiability Tasks (Supervised)
+
+Use AI in **assisted** mode:
+
+- AI generates drafts, humans review before execution
+- AI drafts project plans, humans validate against real constraints
+- AI drafts customer communications, humans approve before sending
+
+These reduce workload without transferring full responsibility to systems that can't self-correct.
+
+### Phase 3: Low-Verifiability Tasks (Human-Owned)
+
+Low-verifiability decisions stay with humans:
+
+- Strategic planning
+- Creative direction
+- Judgment under uncertainty
+
+AI can:
+
+- surface information
+- analyze options
+- simulate scenarios
+
+But decision authority remains with people who understand full context.
+
+## What This Looks Like by Function
+
+### Engineering
+
+AI handles:
+
+- routine code generation
+- test writing
+- documentation
+
+Humans own:
+
+- architecture decisions
+- complex debugging
+- system design and tradeoffs
+
+### Marketing
+
+AI handles:
+
+- drafts for content
+- performance data analysis
+- simple copy variations
+
+Humans own:
+
+- creative strategy
+- brand positioning
+- narrative arcs and big ideas
+
+### Operations
+
+AI handles:
+
+- data processing
+- report generation
+- basic workflow automation
+
+Humans own:
+
+- process optimization
+- resource allocation
+- cross-functional coordination
+
+## Two Mistakes That Break This Framework
+
+### Mistake 1: Inverting the Allocation
+
+Assigning **high-verifiability** tasks to humans while treating **low-verifiability** tasks as AI-ready.
+
+Example:
+
+- Humans write boilerplate code
+- AI "helps" with strategic planning
+
+This is backwards.
+
+### Mistake 2: Treating Verifiability as Binary
+
+The same task can shift categories based on context.
+
+Examples:
+
+Writing code for a **well-tested module with clear requirements**
+
+- High-verifiability
+
+Writing code for a **new system with ambiguous specs**
+
+- Low-verifiability
+
+Context determines AI suitability, not the label on the task.
+
+## Reconciling the Conflicting Data Points
+
+In the METR study, experienced developers got **19% slower** with AI because complex open-source contributions are **low-verifiability** tasks.
+
+Success requires understanding architecture, anticipating edge cases, and matching existing patterns. AI can't verify those dimensions, so it generates code that looks right but fails implicit standards.
+
+At the same time, **41% of code is now AI-generated** because much software development is **high-verifiability** work:
+
+- implementing known algorithms
+- wiring up documented APIs
+- formatting data to schemas
+
+These are perfect AI applications.
+
+Both findings are true. They're describing **different task categories**.
+
+## Implementation Roadmap: Verifiability First, Hype Last
+
+Your roadmap prioritizes based on verifiability, not hype.
+
+1. Start with workflows where you can measure correctness **immediately and objectively**.
+2. Expand to supervised tasks where AI assists but humans maintain ownership.
+3. Keep strategic, judgment-heavy work with humans who know what success looks like-even when you can't fully quantify it.
+
+The **verifiability principle** explains why AI crushes certain tasks while failing at others. It's not about AI being smart or dumb. It's about whether the task provides feedback loops that enable self-correction.
+
+Align your AI deployment strategy with that reality, and you'll capture genuine productivity gains while avoiding the costly failures that happen when you assign AI to tasks it fundamentally can't verify.

@@ -1,0 +1,217 @@
+---
+title: "The Platform Dependency Audit: Evaluating AI Vendor Lock-In Risk Before It's Too Late"
+excerpt: "Most businesses realize they're locked into a single AI platform only after that platform changes pricing, deprecates a critical feature, or gets acquired. By then, migrating off costs months of work and tens of thousands in lost productivity."
+category: "General"
+author: "Friday Signal Team"
+publishedAt: "2025-11-17"
+featuredImage: "https://vxrbpcjyfgqeadqpbjxq.supabase.co/storage/v1/object/public/blog-images/blog/1763398813421-127yk1glm1xa.png"
+---
+
+Most businesses realize they're locked into a single AI platform only after that platform changes pricing, deprecates a critical feature, or gets acquired. By then, migrating off costs months of work and tens of thousands in lost productivity.
+
+We've watched this pattern repeat across portfolio companies. A team builds their entire content operation on ChatGPT. OpenAI shifts API pricing. Suddenly, their cost per article doubles and they have no backup plan. Or a sales team automates lead qualification through Google's AI tools, then Google sunsets the feature with 90 days notice. The scramble to rebuild eats the efficiency gains they spent six months capturing.
+
+Here's what makes platform dependency dangerous right now: consolidation is accelerating. OpenAI, Google, and Microsoft are racing to become your single AI vendor. Each wants to own your workflows, your data, and your team's muscle memory. The convenience of one platform feels efficient until that platform becomes a single point of failure.
+
+This isn't an argument against using major platforms. It's a framework for evaluating your exposure before a vendor decision forces your hand. We tested this audit process with three companies facing different dependency scenarios. It takes 4–6 hours to complete and gives you a clear picture of where you're vulnerable and what mitigation actually costs.
+
+## The Real Cost of Platform Lock-In
+
+Platform dependency isn't binary. You're not either locked in or free. Every business exists on a spectrum from diversified to concentrated, and the right position depends on your risk tolerance and operational complexity.
+
+We've seen three common failure patterns:
+
+### The Single-Vendor Trap
+
+One company built their entire customer support automation on Anthropic's Claude. When Anthropic changed their rate limits, the company's support queue backed up for three days while they negotiated a new contract. They had no fallback. The cost wasn't just the contract negotiation - it was 72 hours of degraded customer experience because they'd optimized for convenience over resilience.
+
+### The Integration Debt Problem
+
+Another business used Microsoft's AI tools exclusively because they already used Microsoft 365. Simple at first. But when they wanted to add a capability Microsoft didn't offer, they faced a choice: stay limited or spend weeks building custom integrations between Microsoft and another vendor's systems. The technical debt of their single-platform approach had compounded silently.
+
+### The Skills Monoculture
+
+A third company trained their entire team on OpenAI's tools and prompting patterns. When they needed to evaluate Anthropic or Google for a specific use case, no one knew how to assess fit or translate their existing prompts. Their team's expertise had calcified around one platform's quirks and capabilities.
+
+None of these companies made obviously wrong decisions. They made reasonable choices that became problems only when circumstances changed. The issue isn't that they used major platforms - it's that they never audited what using those platforms exclusively would cost them later.
+
+## The Four-Dimension Risk Assessment
+
+Platform dependency shows up in four areas: operations, data, integrations, and skills. Each dimension carries different risk and requires different mitigation strategies.
+
+### Operations Risk
+
+Operations Risk measures how many critical workflows depend on a single platform. List every AI-driven process in your business. For each one, ask: If this platform disappeared tomorrow, what stops working? How long to restore function?
+
+We recommend a simple scoring system:
+
+- **Green:** documented alternatives you could activate in under 48 hours
+- **Yellow:** 1–2 weeks to migrate
+- **Red:** a month or more to replace
+
+If more than 30% of your workflows are yellow or red for a single platform, you're carrying material operational risk.
+
+One company we worked with discovered that 60% of their content production depended on GPT-4. Not just "used it" - truly depended on it with no backup. Their audit revealed the exposure. They didn't abandon GPT-4, but they built documented fallback processes for their three highest-volume workflows. When OpenAI had an outage six weeks later, they lost two hours instead of two days.
+
+### Data Risk
+
+Data Risk evaluates how much proprietary context lives inside platform-specific storage. If you've built extensive custom instructions, fine-tuned models, or accumulated conversation histories in one platform, that's data you'd lose in a migration.
+
+The test: **Could you export your platform-specific data in a usable format today?** Not theoretically - actually do it.
+
+Many platforms make export technically possible but practically difficult. One business found they had 14 months of Claude Projects data they couldn't easily move to another system without manual reconstruction. That's lock-in through friction, not contract.
+
+### Integration Risk
+
+Integration Risk tracks technical dependencies between your platform and other systems. API connections, automation workflows, data pipelines - each integration point is a potential failure point if you need to switch vendors.
+
+Count your integration touchpoints for each platform. Then categorize them:
+
+- **Portable:** simple API calls that require minimal changes
+- **Platform-specific:** integrations tied to proprietary features or unique data structures
+
+The higher your ratio of platform-specific integrations to portable ones, the costlier migration becomes.
+
+### Skills Risk
+
+Skills Risk measures team expertise concentration. If your entire team knows how to prompt Claude but has never used GPT-4, you've created organizational lock-in even without technical dependencies.
+
+Survey your team. What platforms can each person use effectively? What platforms have they only heard about? If 80% of your team's AI capability is concentrated in one platform's ecosystem, you're vulnerable. Not because the platform will fail, but because your ability to evaluate alternatives or negotiate leverage has atrophied.
+
+## The Decision Matrix: When Single-Platform Makes Sense
+
+Platform dependency isn't always wrong. Sometimes concentrated commitment beats diversification. The key is making that choice deliberately instead of drifting into it.
+
+### Commit to a single platform when:
+
+**Your operational scale justifies enterprise support.**
+At $50,000+ annual spend, you can negotiate SLAs, support, and stability guarantees. Smaller accounts can't.
+
+**Your use cases align tightly with one platform's strengths.**
+For example:
+
+- complex reasoning → Claude
+- multimodal scale → GPT-4V
+
+**Your team is small and can't maintain expertise across multiple vendors.**
+A tiny team is better off mastering one platform than spreading thin across five.
+
+### Diversify across platforms when:
+
+**Different workflows perform best on different vendors.**
+Content may be best on Claude, image generation on DALL-E, code review on GPT-4.
+
+**Your industry has regulatory requirements that could shift.**
+Backup options protect you from sudden compliance changes.
+
+**AI spend becomes a top-five cost center.**
+You need negotiating leverage. A working fallback gives you that.
+
+One company balanced this well:
+They ran 70% of workflows on Claude but maintained working GPT-4 versions of their top five workflows. This wasn't because GPT-4 performed better - it didn't for their needs. It was pricing leverage.
+
+The diversification cost ~15 hours per quarter. It saved them $18,000 annually in negotiations.
+
+## The Migration Roadmap: Building Resilience Without Breaking Operations
+
+Reducing platform dependency doesn't mean ripping out working systems. It means building optionality before you need it.
+
+### Phase 1: Documentation (Week 1-2)
+
+For two weeks, have your team log every AI interaction:
+
+- platform
+- use case
+- frequency
+- business impact
+
+The Pareto pattern holds: 80% of value comes from 20% of workflows.
+
+For each critical workflow, document:
+
+- exact inputs and outputs
+- platform-specific features used
+- acceptable performance requirements
+
+This becomes your future migration playbook.
+
+### Phase 2: Fallback Testing (Week 3-6)
+
+Pick your three highest-volume workflows. Build basic fallback versions on a secondary platform.
+
+Not perfect - just usable.
+
+One company rebuilt their customer email drafting system from GPT-4 to Claude in a week, just as a fallback. When OpenAI had an outage, they switched in 30 minutes instead of rebuilding from zero.
+
+The goal isn't identical quality. The goal is operational continuity at ~90% quality.
+
+### Phase 3: Ongoing Maintenance (Quarterly)
+
+Platforms change every quarter. Your fallbacks must stay current or they aren't real.
+
+Each quarter:
+
+- retest your fallback workflows
+- confirm APIs haven't changed
+- update documentation
+- validate integration touchpoints
+
+Typical cost: **8–12 hours per quarter** for an SMB.
+
+If you aren't willing to invest that time, you're accepting dependency as a risk. That's fine - just be explicit about it.
+
+## What This Actually Costs
+
+We tracked real numbers across three implementations:
+
+### Professional services firm (12 employees)
+
+- Primary: Claude
+- Fallbacks: GPT-4
+- **Implementation:** 18 hours
+- **Quarterly maintenance:** 6 hours
+- **Annual cost:** ~$3,200
+- **Savings:** $8,500 from pricing leverage after Anthropic rate-limit change
+
+### E-commerce business (30 employees)
+
+- Primary: Google AI
+- Fallbacks: OpenAI
+- **Implementation:** 24 hours
+- **Quarterly maintenance:** 8 hours
+- **Annual cost:** ~$4,800
+- **Impact:** Migration took 3 days instead of 3 weeks after a Google deprecation
+
+### Content agency (8 employees)
+
+- Primary: OpenAI
+- Fallbacks: Claude + Gemini
+- **Implementation:** 14 hours
+- **Quarterly maintenance:** 5 hours
+- **Annual cost:** ~$2,600
+- **Benefit:** Negotiation leverage with OpenAI
+
+Across SMBs, resilience typically costs **$3k–$5k per year** in team time. The payoff comes through:
+
+- pricing leverage
+- faster outage recovery
+- smoother transitions during vendor changes
+
+## Start With One Critical Workflow
+
+You don't need to audit everything today. Start with the workflow that would hurt most if it failed tomorrow.
+
+Document it fully:
+
+- inputs
+- outputs
+- dependencies
+- performance requirements
+
+Then spend 4–6 hours proving that it can run - acceptably - on another platform.
+
+If that one workflow represents 40% of your AI value, you've just protected 40% of your operation from a single point of failure.
+
+Most businesses stop there, and often that's enough. The goal isn't zero dependency - it's conscious dependency.
+
+A full Platform Dependency Audit template with scoring rubrics and cost calculators will be released next month. Until then, start with one workflow. Six hours now beats six weeks of crisis migration later.

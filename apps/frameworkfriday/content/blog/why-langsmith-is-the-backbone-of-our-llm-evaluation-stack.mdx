@@ -1,0 +1,86 @@
+---
+title: "Why LangSmith is the Backbone of our LLM Evaluation Stack"
+excerpt: "Building LLM workflows without evaluation is like flying blind. Inputs go in. Responses come out. But what happened in between? Was it helpful? Was it right?"
+category: "Business Intelligence & Research"
+author: "Bihani Madushika"
+publishedAt: "2025-07-10"
+featuredImage: "https://vxrbpcjyfgqeadqpbjxq.supabase.co/storage/v1/object/public/blog-images/blog/1756328620262-avk6eux7ghp.png"
+---
+
+## Introduction: From Black Box to Evaluation-First AI
+
+Building LLM workflows without evaluation is like flying blind. Inputs go in. Responses come out. But what happened in between? Was it helpful? Was it right?
+
+At Framework Friday, we don't guess. We trace, score, and improve everything we build. That's why **LangSmith** is the core observability layer in every agent system we ship. It's not just for devs — it's how BI, product, and operators track what matters: output quality, latency, cost, and continuous performance.
+
+This post explains why we chose LangSmith, what it enables, and how it fits into a real, repeatable evaluation system.
+
+## Why Evaluation Can't Be an Afterthought
+
+Modern LLM workflows are complex. Agents make decisions. Tools run logic. Memory changes outcomes.
+
+Without observability:
+- You can't trust performance
+- You can't explain failure cases
+- You can't optimize prompts or tools
+- You lose time debugging what you can't see
+
+LangSmith changes that. It turns every agent run into a traceable, testable, reviewable event with metrics to prove what's working.
+
+## The Framework Friday LLM Evaluation Stack
+
+LangSmith is the backbone of our observability loop. It connects inputs to outputs with full traceability, exposing the hidden logic, edge cases, and failure points inside even the most complex LLM workflows.
+
+While it excels with agentic systems, LangSmith's core strengths — **tracing, evaluation, and performance monitoring** — apply to any LLM use case: from basic prompt chains to advanced RAG systems or multi-step agents.
+
+We pair **LangSmith** with:
+- **n8n** — Orchestration for agent workflows
+- **GPT-4 and Claude** — For generation
+- **Supabase** — As our vector store for high-precision retrieval
+
+Every run, from tool invocation to LLM output, is logged and scored in real time. LangSmith's dashboards give our entire team a shared, transparent view of system behavior across engineering, BI, and product.
+
+## What LangSmith Unlocks for Operators
+
+Before LangSmith:
+- We relied on logs and hunches
+- Prompt changes weren't tracked
+- Evaluation was inconsistent and slow
+- Stakeholders had no visibility
+
+Now:
+- Every agent run is logged with full context:
+  - What was asked
+  - How it responded
+  - Which tools it used
+  - How long it took
+  - How much it cost
+  - How helpful the answer was
+
+We **track every prompt version**, **score every output**, and **tag every run**. Debugging takes minutes instead of hours. Token burn is under control. Edge cases get flagged before they hit production.
+
+LangSmith gives us **observability that scales**.
+
+## How We Evaluate LLM Output
+
+We use a mix of **automatic** and **human-in-the-loop evaluation**:
+- **LLM-as-Judge** — LangSmith uses GPT or Claude to score responses against rubrics like correctness, helpfulness, and tone
+- **Pairwise comparison** — Test new prompts against old ones
+- **Human review queues** — For tone or clarity, with built-in annotation tools
+
+This evaluation system helps us **improve prompts, catch regressions, and ship better agents week after week**.
+
+## Why LangSmith, Not a Custom Stack
+
+We tested custom scoring in **n8n** and standalone scripts. It worked for small tests — but didn't scale.
+
+LangSmith gave us:
+- Full trace of every run, including tools and memory
+- Built-in scoring — no bolt-on hacks
+- Prompt version control and rollback
+- Human review queues for edge cases
+- Real-time dashboards for cost, latency, and success rates
+
+Unlike other observability platforms, **LangSmith is built specifically for LLMs — not just generic ML**.
+
+> _Let's build agentic systems you can measure, trace, and trust._

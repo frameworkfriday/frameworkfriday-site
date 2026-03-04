@@ -1,0 +1,133 @@
+---
+title: "How We Built and Evaluated AI Chatbots with Self-Hosted n8n and LangSmith"
+excerpt: "The first wave of AI chatbots focused on response generation. The second wave must focus on reliability. At Framework Friday, we build agentic systems that don't just talk — they trace, evaluate, and improve themselves."
+category: "Business Intelligence & Research"
+author: "Bihani Madushika"
+publishedAt: "2025-07-11"
+featuredImage: "https://vxrbpcjyfgqeadqpbjxq.supabase.co/storage/v1/object/public/blog-images/blog/1756328815265-kt4u1c7xvpf.png"
+---
+
+## Introduction: Why Chatbot Evaluation Is No Longer Optional
+
+The first wave of AI chatbots focused on response generation. The second wave must focus on reliability.
+
+At Framework Friday, we build **agentic systems that don't just talk — they trace, evaluate, and improve themselves**.
+
+In this post, we share how our Tiger Team built a **production-ready chatbot stack** using **self-hosted n8n** for orchestration and **LangSmith** for evaluation and observability. It's modular, private, and performance-verified — built for operators who care about what's actually happening under the hood.
+
+## From Automation to Observability: The Shift in Chatbot Design
+
+Today's LLM apps are **complex, multi-step systems**. Without full evaluation, you risk:
+
+- **Burned tokens and unknown costs**
+- **Hallucinated answers that go unnoticed**
+- **Manual QA that can't scale**
+- **No way to prove ROI**
+
+That's why we built **evaluation into the system from the start — not as an afterthought**.
+
+## The Framework Friday Stack
+
+Our chatbot system is structured around five core layers:
+
+- **n8n (self-hosted via Docker)**
+  Acts as the central workflow engine, orchestrating logic, memory, and external tools.
+
+- **LangSmith**
+  Provides full evaluation and observability — tracing every step, scoring responses, and logging token usage.
+
+- **OpenAI GPT-4 (with optional Ollama fallback)**
+  Powers the assistant's natural language responses, tuned for accuracy and low temperature.
+
+- **Supabase**
+  Hosts our vector store, storing embedded documents and supporting high-precision retrieval.
+
+- **Session-based memory (10-turn buffer)**
+  Maintains conversational context across multiple messages, scoped by user session ID.
+
+This modular setup gives us **control, visibility, and performance — without relying on cloud-native SaaS stacks**.
+
+## Implementation: How We Built It
+
+### 1. Self-Hosting n8n with LangSmith Integration
+
+We used **Docker Desktop** to deploy n8n locally, exposing port `5678` and mapping volumes for persistence.
+
+Key environment variables connected the system to LangSmith:
+
+```
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
+LANGCHAIN_API_KEY=your_key
+LANGCHAIN_PROJECT=chatbot-evaluation
+```
+
+This gave us a **GUI-accessible flow builder** with built-in trace logging for every agent run.
+
+### 2. Vector Search from Private Docs
+
+Knowledge ingestion pipeline:
+
+Google Drive → Data Loader → Chunking → Embeddings → Supabase Vector Store
+
+**Optimization decisions:**
+
+- **Chunk size:** 1000 characters
+- **Overlap:** 200 characters
+- **Retrieval:** Top 5 results, threshold >= 0.8
+- **Metadata:** File source, section title, date
+
+This setup delivered **high-relevance context without noise**.
+
+### 3. Configuring the Agent
+
+Using **LangChain's Tools Agent**, we configured:
+
+- Retrieval as a conditional step (not default)
+- System prompt with rules for citation, clarity, and fallback behavior
+- GPT-4 as the LLM, with temperature set at 0.1
+- 10-message memory buffer tied to session ID
+
+Each interaction logged **tool use, response metadata, and agent reasoning paths**.
+
+### 4. Evaluation via LangSmith
+
+LangSmith added **full observability**:
+
+- **Traces** of all tool/LLM/memory steps
+- **Token usage and latency per run**
+- **Quality scores** using LLM-as-a-Judge
+- **Custom session tags** for chatbot versioning and A/B testing
+
+LangSmith didn't just show us **what happened** — it showed **why and at what cost**.
+
+## What Changed for Our Team
+
+This wasn't just a chatbot project. It became a **blueprint for agentic evaluation**.
+
+**Key wins:**
+
+- Debugging time dropped by **70%**
+- Token spend stabilized through early prompt optimization
+- Edge cases flagged before they reached users
+- Stakeholders gained **traceable QA visibility**
+
+Instead of shipping another **black-box tool**, we built an **agentic layer we can trust**.
+
+## Governance: Traceability, Not Guesswork
+
+Every chat flow now generates **structured, reviewable logs**.
+We don't rely on anecdotal feedback. We **trace and score everything** — from the first message to the final token.
+
+Evaluation isn't just about performance. It's about **confidence, governance, and repeatability**.
+
+## Final Thoughts: A Smarter Path to AI Chatbots
+
+This system proves that **self-hosted, evaluation-first AI** is not only possible — it's practical.
+By combining **n8n's flexibility** with **LangSmith's evaluation backbone**, we turned an experimental chatbot into an **operator-ready system**.
+
+Coming next: This full setup — workflows, config, and prompt logic — will be available as a Framework Friday template.
+
+[Join the All-in on AI community](https://www.frameworkfriday.com/join) to access templates, workflows, and full configuration packs.
+
+> _Let's build agentic systems you can measure, trace, and trust._
