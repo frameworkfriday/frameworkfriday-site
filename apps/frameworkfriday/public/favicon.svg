@@ -1,7 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Isometric 3D "F" mark — Framework Friday -->
-  <polygon points="32,2 54,10 32,18 10,10" fill="#FF4F1A"/>
-  <polygon points="10,12 32,20 32,36 10,28" fill="#FF4F1A"/>
-  <polygon points="35,20 54,28 35,36" fill="#FF4F1A"/>
-  <polygon points="10,31 32,39 32,62 10,54" fill="#FF4F1A"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#FF4F1A">
+  <polygon points="50,2 76,15 50,28 24,15"/>
+  <polygon points="24,17 50,30 50,55 24,42"/>
+  <polygon points="52,30 76,42 52,55"/>
+  <polygon points="24,44 50,57 50,99 24,86"/>
 </svg>
