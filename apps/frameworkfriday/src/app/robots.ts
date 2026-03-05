@@ -17,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "Applebot-Extended", allow: "/" },
       { userAgent: "CCBot", allow: "/" },
     ],
-    sitemap: "https://frameworkfriday.ai/sitemap.xml",
+    sitemap: "https://www.frameworkfriday.ai/sitemap.xml",
   };
 }
