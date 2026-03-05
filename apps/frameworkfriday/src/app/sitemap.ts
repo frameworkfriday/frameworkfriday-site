@@ -7,8 +7,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: "https://frameworkfriday.ai", changeFrequency: "weekly", priority: 1.0 },
     { url: "https://frameworkfriday.ai/about", changeFrequency: "monthly", priority: 0.8 },
-    { url: "https://frameworkfriday.ai/academy", changeFrequency: "monthly", priority: 0.8 },
-    { url: "https://frameworkfriday.ai/forum", changeFrequency: "monthly", priority: 0.8 },
     { url: "https://frameworkfriday.ai/resources", changeFrequency: "monthly", priority: 0.7 },
     { url: "https://frameworkfriday.ai/media", changeFrequency: "monthly", priority: 0.6 },
     { url: "https://frameworkfriday.ai/careers", changeFrequency: "monthly", priority: 0.5 },

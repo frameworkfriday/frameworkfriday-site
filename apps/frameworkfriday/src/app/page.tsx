@@ -127,7 +127,7 @@ export default function Home() {
               <p className="text-gray-500 mt-3 flex-1 leading-relaxed text-sm sm:text-base">
                 Free foundational resources. Five self-paced lessons that prepare you for AI implementation. Each lesson produces an artifact.
               </p>
-              <a href="https://start.frameworkfriday.ai/academy-home" target="_blank" rel="noopener noreferrer" className="mt-5 sm:mt-6 inline-flex items-center gap-1.5 text-gray-950 font-semibold hover:text-primary transition-colors">
+              <a href="https://start.frameworkfriday.ai/academy" target="_blank" rel="noopener noreferrer" className="mt-5 sm:mt-6 inline-flex items-center gap-1.5 text-gray-950 font-semibold hover:text-primary transition-colors">
                 Explore Academy <ArrowRight size={16} />
               </a>
             </div>
@@ -139,9 +139,9 @@ export default function Home() {
               <p className="text-white/80 mt-3 flex-1 leading-relaxed text-sm sm:text-base">
                 For Decision Sprint graduates: ongoing peer accountability for operators actively building AI workflows.
               </p>
-              <Link href="/forum" className="mt-5 sm:mt-6 inline-flex items-center gap-1.5 text-white font-semibold hover:underline">
+              <a href="https://start.frameworkfriday.ai/forum" target="_blank" rel="noopener noreferrer" className="mt-5 sm:mt-6 inline-flex items-center gap-1.5 text-white font-semibold hover:underline">
                 Learn About Forum <ArrowRight size={16} />
-              </Link>
+              </a>
             </div>
           </div>
         </div>
