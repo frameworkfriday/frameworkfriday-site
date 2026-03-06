@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { SprintDailyRecap, RecapResource } from "@/lib/types/sprint";
-import { Save, Radio, Upload, Trash2, Plus, ExternalLink, Check, AlertCircle } from "lucide-react";
+import { Save, Radio, Upload, Trash2, Plus, ExternalLink, Check, AlertCircle, Clock, ShieldCheck } from "lucide-react";
+import { formatRelativeTime, formatFullTimestamp } from "@/lib/format-time";
 
 interface DailyRecapsEditorProps {
   sprintId: string;
@@ -24,6 +25,13 @@ export function DailyRecapsEditor({
   const router = useRouter();
   const [activeDay, setActiveDay] = useState(1);
   const [saveStatus, setSaveStatus] = useState<{ day: number; status: "saved" | "error"; message?: string } | null>(null);
+  const [lastSavedAt, setLastSavedAt] = useState<Record<number, string>>(() => {
+    const times: Record<number, string> = {};
+    recaps.forEach((r) => {
+      times[r.day_number] = r.updated_at;
+    });
+    return times;
+  });
 
   // Initialize state for each day
   const [dayStates, setDayStates] = useState(() => {
@@ -154,8 +162,10 @@ export function DailyRecapsEditor({
         updateDay(day, { id: result.id });
       }
 
+      const savedTime = new Date().toISOString();
       updateDay(day, { saving: false });
       setSaveStatus({ day, status: "saved" });
+      setLastSavedAt((prev) => ({ ...prev, [day]: savedTime }));
       setTimeout(() => setSaveStatus(null), 3000);
       router.refresh();
     } catch (err: unknown) {
@@ -362,25 +372,36 @@ export function DailyRecapsEditor({
         </div>
 
         {/* Save */}
-        <div className="pt-4 border-t border-gray-100 flex items-center gap-3">
-          <Button
-            type="button"
-            onClick={() => saveDay(activeDay)}
-            disabled={current.saving}
-          >
-            <Save size={16} />
-            {current.saving ? "Saving..." : `Save Day ${activeDay}`}
-          </Button>
-          {saveStatus?.day === activeDay && saveStatus.status === "saved" && (
-            <span className="flex items-center gap-1.5 text-sm text-success font-medium">
-              <Check size={16} />
-              Saved
-            </span>
-          )}
-          {saveStatus?.day === activeDay && saveStatus.status === "error" && (
-            <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
-              <AlertCircle size={16} />
-              {saveStatus.message}
+        <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              onClick={() => saveDay(activeDay)}
+              disabled={current.saving}
+            >
+              <Save size={16} />
+              {current.saving ? "Saving..." : `Save Day ${activeDay}`}
+            </Button>
+            {saveStatus?.day === activeDay && saveStatus.status === "saved" && (
+              <span className="flex items-center gap-1.5 text-sm text-success font-medium animate-fade-in">
+                <ShieldCheck size={16} />
+                Saved successfully
+              </span>
+            )}
+            {saveStatus?.day === activeDay && saveStatus.status === "error" && (
+              <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
+                <AlertCircle size={16} />
+                {saveStatus.message}
+              </span>
+            )}
+          </div>
+          {lastSavedAt[activeDay] && (
+            <span
+              className="flex items-center gap-1 text-xs text-gray-400"
+              title={formatFullTimestamp(lastSavedAt[activeDay])}
+            >
+              <Clock size={11} />
+              Last updated {formatRelativeTime(lastSavedAt[activeDay])}
             </span>
           )}
         </div>

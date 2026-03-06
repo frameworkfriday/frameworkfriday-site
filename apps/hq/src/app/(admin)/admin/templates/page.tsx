@@ -7,7 +7,7 @@ export default async function TemplatesPage() {
 
   const { data: templates } = await supabase
     .from("sprint_templates")
-    .select("id, name, is_active, created_at")
+    .select("id, name, is_active, created_at, updated_at")
     .order("created_at", { ascending: false });
 
   return (

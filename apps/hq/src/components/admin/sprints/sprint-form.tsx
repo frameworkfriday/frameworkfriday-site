@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import type { Sprint } from "@/lib/types/sprint";
-import { Save, Check, AlertCircle } from "lucide-react";
+import { Save, Check, AlertCircle, Clock, ShieldCheck } from "lucide-react";
+import { formatRelativeTime, formatFullTimestamp } from "@/lib/format-time";
 
 const TIMEZONES = [
   "America/New_York",
@@ -74,6 +75,9 @@ export function SprintForm({ sprint, templates }: SprintFormProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | null>(null);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(
+    sprint?.updated_at ?? null
+  );
 
   // Auto-generate title/slug when date changes (only for new sprints)
   const handleDateChange = (date: string) => {
@@ -128,9 +132,11 @@ export function SprintForm({ sprint, templates }: SprintFormProps) {
       }
     }
 
+    const savedTime = new Date().toISOString();
     setSaving(false);
     if (isEditing) {
       setSaveStatus("saved");
+      setLastSavedAt(savedTime);
       setTimeout(() => setSaveStatus(null), 3000);
       router.refresh();
     } else {
@@ -312,28 +318,39 @@ export function SprintForm({ sprint, templates }: SprintFormProps) {
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={saving}>
-          <Save size={16} />
-          {saving ? "Saving..." : isEditing ? "Save Changes" : "Create Sprint"}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push("/admin/sprints")}
-        >
-          Cancel
-        </Button>
-        {saveStatus === "saved" && (
-          <span className="flex items-center gap-1.5 text-sm text-success font-medium">
-            <Check size={16} />
-            Saved
-          </span>
-        )}
-        {error && (
-          <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
-            <AlertCircle size={16} />
-            {error}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={saving}>
+            <Save size={16} />
+            {saving ? "Saving..." : isEditing ? "Save Changes" : "Create Sprint"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push("/admin/sprints")}
+          >
+            Cancel
+          </Button>
+          {saveStatus === "saved" && (
+            <span className="flex items-center gap-1.5 text-sm text-success font-medium animate-fade-in">
+              <ShieldCheck size={16} />
+              Saved successfully
+            </span>
+          )}
+          {error && (
+            <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
+              <AlertCircle size={16} />
+              {error}
+            </span>
+          )}
+        </div>
+        {lastSavedAt && (
+          <span
+            className="flex items-center gap-1 text-xs text-gray-400"
+            title={formatFullTimestamp(lastSavedAt)}
+          >
+            <Clock size={11} />
+            Last updated {formatRelativeTime(lastSavedAt)}
           </span>
         )}
       </div>

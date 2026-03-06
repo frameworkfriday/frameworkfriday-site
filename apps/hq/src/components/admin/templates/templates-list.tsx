@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Pencil } from "lucide-react";
+import { Pencil, Clock } from "lucide-react";
+import { formatRelativeTime, formatFullTimestamp } from "@/lib/format-time";
 
 interface TemplateRow {
   id: string;
   name: string;
   is_active: boolean;
   created_at: string;
+  updated_at: string;
 }
 
 interface TemplatesListProps {
@@ -44,7 +46,7 @@ export function TemplatesList({ templates }: TemplatesListProps) {
               Status
             </th>
             <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Created
+              Updated
             </th>
             <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider w-12">
               &nbsp;
@@ -72,8 +74,14 @@ export function TemplatesList({ templates }: TemplatesListProps) {
                   <Badge variant="outline">Inactive</Badge>
                 )}
               </td>
-              <td className="px-5 py-3.5 text-sm text-gray-500">
-                {formatDate(template.created_at)}
+              <td className="px-5 py-3.5">
+                <span
+                  className="flex items-center gap-1 text-xs text-gray-400"
+                  title={formatFullTimestamp(template.updated_at)}
+                >
+                  <Clock size={11} />
+                  {formatRelativeTime(template.updated_at)}
+                </span>
               </td>
               <td className="px-5 py-3.5">
                 <Link

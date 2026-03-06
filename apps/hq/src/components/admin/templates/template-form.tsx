@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { SprintTemplate } from "@/lib/types/sprint";
-import { Save, Upload, Check, AlertCircle } from "lucide-react";
+import { Save, Upload, Check, AlertCircle, Clock, ShieldCheck } from "lucide-react";
+import { formatRelativeTime, formatFullTimestamp } from "@/lib/format-time";
 
 interface TemplateFormProps {
   template: SprintTemplate;
@@ -65,6 +66,9 @@ export function TemplateForm({ template }: TemplateFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | null>(null);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(
+    template.updated_at ?? null
+  );
 
   const handleFileUpload = async (
     bucket: string,
@@ -133,8 +137,10 @@ export function TemplateForm({ template }: TemplateFormProps) {
       return;
     }
 
+    const savedTime = new Date().toISOString();
     setSaving(false);
     setSaveStatus("saved");
+    setLastSavedAt(savedTime);
     setTimeout(() => setSaveStatus(null), 3000);
     router.refresh();
   };
@@ -406,28 +412,39 @@ export function TemplateForm({ template }: TemplateFormProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={saving}>
-          <Save size={16} />
-          {saving ? "Saving..." : "Save Template"}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push("/admin/templates")}
-        >
-          Cancel
-        </Button>
-        {saveStatus === "saved" && (
-          <span className="flex items-center gap-1.5 text-sm text-success font-medium">
-            <Check size={16} />
-            Saved
-          </span>
-        )}
-        {error && (
-          <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
-            <AlertCircle size={16} />
-            {error}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={saving}>
+            <Save size={16} />
+            {saving ? "Saving..." : "Save Template"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push("/admin/templates")}
+          >
+            Cancel
+          </Button>
+          {saveStatus === "saved" && (
+            <span className="flex items-center gap-1.5 text-sm text-success font-medium animate-fade-in">
+              <ShieldCheck size={16} />
+              Saved successfully
+            </span>
+          )}
+          {error && (
+            <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
+              <AlertCircle size={16} />
+              {error}
+            </span>
+          )}
+        </div>
+        {lastSavedAt && (
+          <span
+            className="flex items-center gap-1 text-xs text-gray-400"
+            title={formatFullTimestamp(lastSavedAt)}
+          >
+            <Clock size={11} />
+            Last updated {formatRelativeTime(lastSavedAt)}
           </span>
         )}
       </div>

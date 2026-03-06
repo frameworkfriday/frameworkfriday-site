@@ -11,7 +11,7 @@ export default async function SprintsPage() {
   const { data: sprints } = await supabase
     .from("sprints")
     .select(
-      "id, title, slug, start_date, timezone, session_time, status, template_id, created_at"
+      "id, title, slug, start_date, timezone, session_time, status, template_id, created_at, updated_at"
     )
     .order("start_date", { ascending: false });
 

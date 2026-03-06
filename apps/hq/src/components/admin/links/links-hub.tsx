@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, ExternalLink } from "lucide-react";
+import { Check, Copy, ExternalLink, Clock } from "lucide-react";
+import { formatRelativeTime, formatFullTimestamp } from "@/lib/format-time";
 
 interface TemplateLinks {
   id: string;
   name: string;
+  updated_at: string;
   project_kit_url: string | null;
   submit_work_url: string | null;
   submit_work_embed_url: string | null;
@@ -23,6 +25,7 @@ interface SprintLinks {
   id: string;
   title: string;
   slug: string;
+  updated_at: string;
   zoom_url_day1: string | null;
   zoom_url_day2: string | null;
   zoom_url_day3: string | null;
@@ -134,12 +137,21 @@ export function LinksHub({ templates, sprints }: LinksHubProps) {
       <div className="p-6">
         {tab === "template" && activeTemplate && (
           <div>
-            <p className="text-sm text-gray-500 mb-4">
-              Shared links from template:{" "}
-              <span className="font-medium text-gray-700">
-                {activeTemplate.name}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-500">
+                Shared links from template:{" "}
+                <span className="font-medium text-gray-700">
+                  {activeTemplate.name}
+                </span>
+              </p>
+              <span
+                className="flex items-center gap-1 text-xs text-gray-400"
+                title={formatFullTimestamp(activeTemplate.updated_at)}
+              >
+                <Clock size={11} />
+                Updated {formatRelativeTime(activeTemplate.updated_at)}
               </span>
-            </p>
+            </div>
 
             <div>
               <LinkRow
@@ -228,6 +240,15 @@ export function LinksHub({ templates, sprints }: LinksHubProps) {
 
                 {selectedSprintData && (
                   <div>
+                    <div className="flex justify-end mb-3">
+                      <span
+                        className="flex items-center gap-1 text-xs text-gray-400"
+                        title={formatFullTimestamp(selectedSprintData.updated_at)}
+                      >
+                        <Clock size={11} />
+                        Updated {formatRelativeTime(selectedSprintData.updated_at)}
+                      </span>
+                    </div>
                     <LinkRow
                       label="Sprint Page"
                       url={`${origin}/${selectedSprintData.slug}`}

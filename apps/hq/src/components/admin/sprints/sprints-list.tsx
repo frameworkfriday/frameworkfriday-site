@@ -13,7 +13,9 @@ import {
   Archive,
   Trash2,
   Files,
+  Clock,
 } from "lucide-react";
+import { formatRelativeTime, formatFullTimestamp } from "@/lib/format-time";
 
 interface SprintRow {
   id: string;
@@ -25,6 +27,7 @@ interface SprintRow {
   status: string;
   template_id: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 interface SprintsListProps {
@@ -172,6 +175,9 @@ export function SprintsList({ sprints, templateNames }: SprintsListProps) {
                 <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  Updated
+                </th>
                 <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider w-12">
                   &nbsp;
                 </th>
@@ -206,6 +212,15 @@ export function SprintsList({ sprints, templateNames }: SprintsListProps) {
                       : "—"}
                   </td>
                   <td className="px-5 py-3.5">{statusBadge(sprint.status)}</td>
+                  <td className="px-5 py-3.5">
+                    <span
+                      className="flex items-center gap-1 text-xs text-gray-400"
+                      title={formatFullTimestamp(sprint.updated_at)}
+                    >
+                      <Clock size={11} />
+                      {formatRelativeTime(sprint.updated_at)}
+                    </span>
+                  </td>
                   <td className="px-5 py-3.5 relative">
                     <button
                       onClick={() =>
