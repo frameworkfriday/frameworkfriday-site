@@ -7,7 +7,8 @@ import { Suspense, useState } from "react";
 function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/admin";
-  const [error, setError] = useState<string | null>(null);
+  const callbackError = searchParams.get("error");
+  const [error, setError] = useState<string | null>(callbackError);
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = async () => {
