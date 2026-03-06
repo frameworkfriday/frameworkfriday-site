@@ -15,7 +15,7 @@ interface DailyRecapsEditorProps {
   recaps: SprintDailyRecap[];
 }
 
-const DAYS = [1, 2, 3, 4];
+const DAYS = [1, 2, 3];
 
 export function DailyRecapsEditor({
   sprintId,

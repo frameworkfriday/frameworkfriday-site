@@ -22,6 +22,11 @@ interface Props {
   template: SprintTemplatePublic | null;
 }
 
+function normalizeUrl(url: string): string {
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `https://${url}`;
+}
+
 export function DailyRecaps({ recaps, scheduleWithDates, phaseInfo }: Props) {
   // Show newest day first
   const recapsReversed = [...recaps].reverse();
@@ -110,7 +115,7 @@ export function DailyRecaps({ recaps, scheduleWithDates, phaseInfo }: Props) {
               <div className="space-y-4">
                 {activeRecap.recording_url && (
                   <a
-                    href={activeRecap.recording_url}
+                    href={normalizeUrl(activeRecap.recording_url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group"
@@ -142,7 +147,7 @@ export function DailyRecaps({ recaps, scheduleWithDates, phaseInfo }: Props) {
                       {activeRecap.resources.map((resource) => (
                         <a
                           key={resource.id}
-                          href={resource.url}
+                          href={normalizeUrl(resource.url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 p-3 rounded-lg border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

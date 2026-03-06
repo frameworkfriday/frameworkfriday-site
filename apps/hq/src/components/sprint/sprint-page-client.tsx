@@ -85,12 +85,8 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
   const publishedRecaps = recaps.filter((r) => r.is_published);
   const hasRecaps = publishedRecaps.length > 0;
 
-  // During active/post-sprint with recaps, show recaps first
-  const showRecapsFirst =
-    hasRecaps &&
-    (phaseInfo.phase === "active" ||
-      phaseInfo.phase === "buffer" ||
-      phaseInfo.phase === "post-sprint");
+  // Always show recaps first when they exist
+  const showRecapsFirst = hasRecaps;
 
   const scrollToSetup = () => {
     setupRef.current?.scrollIntoView({ behavior: "smooth" });
