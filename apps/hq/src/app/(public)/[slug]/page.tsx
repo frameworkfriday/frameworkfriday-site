@@ -9,6 +9,9 @@ import type {
 import { formatSprintDateRange } from "@/lib/sprint-utils";
 import { SprintPageClient } from "@/components/sprint/sprint-page-client";
 
+// Always fetch fresh data — recaps are published in real-time
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
