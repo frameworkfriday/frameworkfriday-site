@@ -29,15 +29,20 @@ export async function middleware(request: NextRequest) {
   }
 
   // Admin routes — require admin role
+  // Uses service role key to bypass RLS (the user_roles RLS policy is circular with anon key)
   if (pathname.startsWith("/admin")) {
-    const { data: role } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .single();
+    const roleRes = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user_roles?user_id=eq.${user.id}&role=eq.admin&select=role`,
+      {
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+        },
+      }
+    );
+    const roles = await roleRes.json();
 
-    if (!role) {
+    if (!Array.isArray(roles) || roles.length === 0) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
