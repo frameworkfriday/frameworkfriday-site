@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { saveRecap } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { SprintDailyRecap, RecapResource } from "@/lib/types/sprint";
-import { Save, Radio, Upload, Trash2, Plus, ExternalLink } from "lucide-react";
+import { Save, Radio, Upload, Trash2, Plus, ExternalLink, Check, AlertCircle } from "lucide-react";
 
 interface DailyRecapsEditorProps {
   sprintId: string;
@@ -22,6 +23,7 @@ export function DailyRecapsEditor({
 }: DailyRecapsEditorProps) {
   const router = useRouter();
   const [activeDay, setActiveDay] = useState(1);
+  const [saveStatus, setSaveStatus] = useState<{ day: number; status: "saved" | "error"; message?: string } | null>(null);
 
   // Initialize state for each day
   const [dayStates, setDayStates] = useState(() => {
@@ -133,39 +135,34 @@ export function DailyRecapsEditor({
 
   const saveDay = async (day: number) => {
     updateDay(day, { saving: true });
+    setSaveStatus(null);
     const state = dayStates[day];
-    const supabase = createClient();
 
-    const payload = {
-      sprint_id: sprintId,
-      day_number: day,
-      is_published: state.isPublished,
-      recording_url: state.recordingUrl || null,
-      recap_summary: state.recapSummary || null,
-      key_takeaways: state.keyTakeaways || null,
-      resources: state.resources.length > 0 ? state.resources : null,
-      published_at: state.isPublished ? new Date().toISOString() : null,
-    };
+    try {
+      const result = await saveRecap({
+        id: state.id,
+        sprint_id: sprintId,
+        day_number: day,
+        is_published: state.isPublished,
+        recording_url: state.recordingUrl || null,
+        recap_summary: state.recapSummary || null,
+        key_takeaways: state.keyTakeaways || null,
+        resources: state.resources.length > 0 ? state.resources : null,
+      });
 
-    if (state.id) {
-      await supabase
-        .from("sprint_daily_recaps")
-        .update(payload)
-        .eq("id", state.id);
-    } else {
-      const { data } = await supabase
-        .from("sprint_daily_recaps")
-        .insert(payload)
-        .select("id")
-        .single();
-
-      if (data) {
-        updateDay(day, { id: data.id });
+      if (!state.id && result.id) {
+        updateDay(day, { id: result.id });
       }
-    }
 
-    updateDay(day, { saving: false });
-    router.refresh();
+      updateDay(day, { saving: false });
+      setSaveStatus({ day, status: "saved" });
+      setTimeout(() => setSaveStatus(null), 3000);
+      router.refresh();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Save failed";
+      updateDay(day, { saving: false });
+      setSaveStatus({ day, status: "error", message });
+    }
   };
 
   const current = dayStates[activeDay];
@@ -365,7 +362,7 @@ export function DailyRecapsEditor({
         </div>
 
         {/* Save */}
-        <div className="pt-4 border-t border-gray-100">
+        <div className="pt-4 border-t border-gray-100 flex items-center gap-3">
           <Button
             type="button"
             onClick={() => saveDay(activeDay)}
@@ -374,6 +371,18 @@ export function DailyRecapsEditor({
             <Save size={16} />
             {current.saving ? "Saving..." : `Save Day ${activeDay}`}
           </Button>
+          {saveStatus?.day === activeDay && saveStatus.status === "saved" && (
+            <span className="flex items-center gap-1.5 text-sm text-success font-medium">
+              <Check size={16} />
+              Saved
+            </span>
+          )}
+          {saveStatus?.day === activeDay && saveStatus.status === "error" && (
+            <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
+              <AlertCircle size={16} />
+              {saveStatus.message}
+            </span>
+          )}
         </div>
       </div>
     </div>
