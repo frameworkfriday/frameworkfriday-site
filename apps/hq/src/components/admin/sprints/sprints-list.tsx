@@ -42,12 +42,21 @@ export function SprintsList({ sprints, templateNames }: SprintsListProps) {
 
   const today = new Date().toISOString().split("T")[0];
 
-  const currentSprints = sprints.filter(
-    (s) => s.start_date >= today || s.status === "published"
-  );
-  const pastSprints = sprints.filter(
-    (s) => s.start_date < today && s.status !== "published"
-  );
+  // Sprint is "past" once its Sunday has passed (start_date + 6 days)
+  // This means Monday at 00:00, the previous week's sprint moves to Past
+  const sprintEndSunday = (startDate: string) => {
+    const d = new Date(startDate + "T00:00:00");
+    d.setDate(d.getDate() + 6);
+    return d.toISOString().split("T")[0];
+  };
+
+  const currentSprints = sprints
+    .filter((s) => sprintEndSunday(s.start_date) >= today)
+    .sort((a, b) => a.start_date.localeCompare(b.start_date)); // soonest first
+
+  const pastSprints = sprints
+    .filter((s) => sprintEndSunday(s.start_date) < today)
+    .sort((a, b) => b.start_date.localeCompare(a.start_date)); // most recent first
 
   const displayed = tab === "current" ? currentSprints : pastSprints;
 
