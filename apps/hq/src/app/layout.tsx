@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   title: "Decision Sprint HQ",
   description: "Your one-stop shop for everything in your Decision Sprint.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
 };
 

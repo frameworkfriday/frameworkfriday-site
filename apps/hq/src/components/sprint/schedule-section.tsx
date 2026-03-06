@@ -123,32 +123,32 @@ export function ScheduleSection({
 
       <div className="mt-6 space-y-3">
         {scheduleWithDates.map((day) => {
+          const isBuffer = !day.hasSession;
+          const isDay4 = day.day === 4;
           const isExpanded = expandedDay === day.day;
-          const isActive = phaseInfo.activeDay === day.day;
+          const isActive = !isBuffer && phaseInfo.activeDay === day.day;
           const isPast =
             phaseInfo.phase === "post-sprint" ||
             (phaseInfo.activeDay && day.day < phaseInfo.activeDay);
-          const isBuffer = day.day === 4; // Thursday buffer
-          const isDay4 = day.day === 5; // Friday Day 4
 
-          // Buffer day (day 4 in schedule = Thursday)
+          // Buffer day (no session — Thursday)
           if (isBuffer) {
             return (
               <div
-                key={day.day}
+                key={`buffer-${day.dayOfWeek}`}
                 className="flex items-center gap-3 px-4 py-3 text-sm text-gray-400"
               >
                 <span className="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs font-medium">
                   Buffer
                 </span>
                 <span>
-                  {day.date} · Completion Buffer
+                  {day.dayOfWeek}, {day.date} &middot; {day.topic}
                 </span>
               </div>
             );
           }
 
-          const dayNumber = day.day <= 3 ? day.day : 4;
+          const dayNumber = day.day;
           const zoomUrl = getZoomUrl(dayNumber);
           const topics = getDayTopics(dayNumber);
 

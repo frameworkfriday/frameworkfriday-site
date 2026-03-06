@@ -51,7 +51,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
       {/* Mobile header */}
       <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <Image src="/logo.svg" alt="Decision Sprint" width={32} height={32} />
+          <Image src="/logo.png" alt="Decision Sprint" width={32} height={32} />
           <span className="font-semibold text-gray-900">Sprint Admin</span>
         </div>
         <button
@@ -79,7 +79,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
         {/* Sidebar header */}
         <div className="p-5 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
-            <Image src="/logo.svg" alt="Decision Sprint" width={36} height={36} />
+            <Image src="/logo.png" alt="Decision Sprint" width={36} height={36} />
             <div>
               <p className="font-semibold text-sm text-gray-900">
                 Sprint Admin

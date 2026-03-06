@@ -23,7 +23,7 @@ export function SprintHeader({ dateRange }: Props) {
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
           <div className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="Decision Sprint" width={32} height={32} className="text-gray-900" />
+            <Image src="/logo.png" alt="Decision Sprint" width={32} height={32} />
             <span className="font-semibold text-gray-900">
               Decision Sprint
             </span>

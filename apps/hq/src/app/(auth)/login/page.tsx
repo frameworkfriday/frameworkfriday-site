@@ -40,7 +40,7 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8">
           <div className="text-center mb-6">
-            <Image src="/logo.svg" alt="Decision Sprint" width={48} height={48} className="mx-auto mb-3" />
+            <Image src="/logo.png" alt="Decision Sprint" width={48} height={48} className="mx-auto mb-3" />
             <h1 className="text-xl font-bold text-gray-900">Sprint Admin</h1>
             <p className="text-sm text-gray-500 mt-1">
               Sign in to manage sprints and templates
