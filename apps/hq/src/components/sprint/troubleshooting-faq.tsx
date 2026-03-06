@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Shield } from "lucide-react";
+import { DataHandlingPolicy } from "./data-handling-policy";
 
 interface FAQItem {
   question: string;
@@ -103,6 +104,7 @@ const FAQ_DATA: FAQCategory[] = [
 
 export function TroubleshootingFAQ() {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+  const [policyOpen, setPolicyOpen] = useState(false);
 
   const toggleItem = (key: string) => {
     setOpenItems((prev) => {
@@ -158,7 +160,20 @@ export function TroubleshootingFAQ() {
             </div>
           </div>
         ))}
+
+        {/* Data handling policy link */}
+        <div className="text-center">
+          <button
+            onClick={() => setPolicyOpen(true)}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
+          >
+            <Shield size={14} />
+            View full data handling policy
+          </button>
+        </div>
       </div>
+
+      <DataHandlingPolicy open={policyOpen} onClose={() => setPolicyOpen(false)} />
     </section>
   );
 }

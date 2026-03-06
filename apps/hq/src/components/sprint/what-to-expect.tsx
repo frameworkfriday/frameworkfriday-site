@@ -53,22 +53,22 @@ export function WhatToExpect() {
         </div>
 
         {/* Your Outcome */}
-        <div className="border border-gray-200 rounded-xl p-5">
-          <h3 className="font-semibold text-gray-900">Your Outcome</h3>
-          <p className="text-sm text-gray-500 mt-1">
+        <div className="bg-gray-900 rounded-xl p-5 text-white">
+          <h3 className="font-semibold">Your Outcome</h3>
+          <p className="text-sm text-gray-400 mt-1">
             On Day 4, you&apos;ll receive either:
           </p>
           <div className="mt-3 space-y-2">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+            <div className="bg-white/10 rounded-lg p-3">
               <p className="text-sm font-semibold text-success">Go</p>
-              <p className="text-xs text-gray-600">Ready to proceed</p>
+              <p className="text-xs text-gray-300">Ready to proceed</p>
             </div>
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-              <p className="text-sm font-semibold text-warning">Not Yet</p>
-              <p className="text-xs text-gray-600">More groundwork needed</p>
+            <div className="bg-white/10 rounded-lg p-3">
+              <p className="text-sm font-semibold text-primary">Not Yet</p>
+              <p className="text-xs text-gray-300">More groundwork needed</p>
             </div>
           </div>
-          <p className="text-xs text-gray-400 italic mt-2">
+          <p className="text-xs text-gray-500 italic mt-2">
             Both outcomes are valuable—you&apos;ll have clarity either way.
           </p>
         </div>

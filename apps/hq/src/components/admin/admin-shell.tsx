@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import {
@@ -50,9 +51,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
       {/* Mobile header */}
       <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
-            <Zap size={16} className="text-white" />
-          </div>
+          <Image src="/logo.svg" alt="Decision Sprint" width={32} height={32} />
           <span className="font-semibold text-gray-900">Sprint Admin</span>
         </div>
         <button
@@ -80,9 +79,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
         {/* Sidebar header */}
         <div className="p-5 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gray-900 rounded-lg flex items-center justify-center">
-              <Zap size={18} className="text-white" />
-            </div>
+            <Image src="/logo.svg" alt="Decision Sprint" width={36} height={36} />
             <div>
               <p className="font-semibold text-sm text-gray-900">
                 Sprint Admin

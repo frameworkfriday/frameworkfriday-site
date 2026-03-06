@@ -12,6 +12,7 @@ import {
   Sparkles,
   FileText,
   ArrowRight,
+  Download,
 } from "lucide-react";
 import type { SprintTemplatePublic } from "@/lib/types/sprint";
 import { cn } from "@/lib/utils";
@@ -134,63 +135,100 @@ export function GettingSetUp({ template, collapsed: initialCollapsed }: Props) {
             </div>
           </div>
 
-          {/* Checklist */}
-          <div className="mt-6 max-w-2xl mx-auto border border-gray-200 rounded-xl divide-y divide-gray-100">
-            {CHECKLIST_ITEMS.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors"
+          {/* Project Kit Download — prominent CTA */}
+          {template?.project_kit_url && (
+            <div className="mt-6 max-w-2xl mx-auto">
+              <a
+                href={template.project_kit_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 bg-gray-900 text-white rounded-xl px-5 py-4 hover:bg-gray-800 transition-colors group"
               >
-                <button
-                  onClick={() => toggleCheck(item.id)}
-                  className="mt-0.5 text-gray-400 hover:text-primary transition-colors"
-                >
-                  {checkedItems.has(item.id) ? (
-                    <CheckCircle2 size={20} className="text-success" />
-                  ) : (
-                    <Circle size={20} />
-                  )}
-                </button>
+                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+                  <Download size={20} className="text-white" />
+                </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    {item.isBonus && (
-                      <Settings size={14} className="text-gray-400" />
+                  <p className="font-semibold text-sm">Download Project Kit</p>
+                  <p className="text-xs text-gray-400">
+                    Everything you need for Day 1 &mdash; frameworks, templates, and conversation starters
+                  </p>
+                </div>
+                <ArrowRight size={18} className="text-gray-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+              </a>
+            </div>
+          )}
+
+          {/* Checklist */}
+          <div className="mt-4 max-w-2xl mx-auto border border-gray-200 rounded-xl divide-y divide-gray-100">
+            {CHECKLIST_ITEMS.map((item) => {
+              // Resolve action URLs from template
+              let actionUrl = item.actionUrl || "#";
+              let actionLabel = item.actionLabel;
+              if (item.id === "companion" && template?.setup_companion_video_url) {
+                actionUrl = template.setup_companion_video_url;
+              } else if (item.id === "calendar") {
+                actionUrl = "#schedule";
+                actionLabel = "View schedule";
+              } else if (item.id === "project-kit") {
+                // Handled by the prominent CTA above
+                return null;
+              }
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors"
+                >
+                  <button
+                    onClick={() => toggleCheck(item.id)}
+                    className="mt-0.5 text-gray-400 hover:text-primary transition-colors cursor-pointer"
+                  >
+                    {checkedItems.has(item.id) ? (
+                      <CheckCircle2 size={20} className="text-success" />
+                    ) : (
+                      <Circle size={20} />
                     )}
-                    <span
-                      className={cn(
-                        "text-sm font-medium",
-                        checkedItems.has(item.id)
-                          ? "text-gray-400 line-through"
-                          : "text-gray-900"
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      {item.isBonus && (
+                        <Settings size={14} className="text-gray-400" />
                       )}
-                    >
-                      {item.label}
-                    </span>
-                    {item.isBonus && (
-                      <span className="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-medium text-gray-500 uppercase">
-                        Bonus Resource
+                      <span
+                        className={cn(
+                          "text-sm font-medium",
+                          checkedItems.has(item.id)
+                            ? "text-gray-400 line-through"
+                            : "text-gray-900"
+                        )}
+                      >
+                        {item.label}
                       </span>
+                      {item.isBonus && (
+                        <span className="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-medium text-gray-500 uppercase">
+                          Bonus Resource
+                        </span>
+                      )}
+                    </div>
+                    {item.description && (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {item.description}
+                      </p>
                     )}
                   </div>
-                  {item.description && (
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {item.description}
-                    </p>
+                  {actionLabel && (
+                    <a
+                      href={actionUrl}
+                      target={actionUrl.startsWith("#") ? undefined : "_blank"}
+                      rel={actionUrl.startsWith("#") ? undefined : "noopener noreferrer"}
+                      className="text-xs text-primary font-medium hover:text-primary-hover flex items-center gap-1 whitespace-nowrap"
+                    >
+                      {actionLabel}
+                      <ExternalLink size={10} />
+                    </a>
                   )}
                 </div>
-                {item.actionLabel && (
-                  <a
-                    href={item.actionUrl || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 whitespace-nowrap"
-                  >
-                    {item.actionLabel}
-                    <ExternalLink size={10} />
-                  </a>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Come Prepared expandable */}
@@ -351,17 +389,31 @@ export function GettingSetUp({ template, collapsed: initialCollapsed }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "block rounded-xl border border-gray-200 p-4 text-center hover:shadow-md transition-shadow",
-                      !video.url && "pointer-events-none opacity-60"
+                      "block rounded-xl p-4 text-center transition-all card-hover",
+                      video.url
+                        ? "bg-gray-900 text-white hover:shadow-lg"
+                        : "bg-gray-100 pointer-events-none opacity-60"
                     )}
                   >
-                    <div className="w-12 h-12 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                      <Play size={18} className="text-gray-500 ml-0.5" />
+                    <div className={cn(
+                      "w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3",
+                      video.url ? "bg-primary/20" : "bg-gray-200"
+                    )}>
+                      <Play size={18} className={cn(
+                        "ml-0.5",
+                        video.url ? "text-primary" : "text-gray-400"
+                      )} />
                     </div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className={cn(
+                      "text-sm font-medium",
+                      video.url ? "text-white" : "text-gray-900"
+                    )}>
                       {video.title}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className={cn(
+                      "text-xs mt-0.5",
+                      video.url ? "text-gray-400" : "text-gray-500"
+                    )}>
                       {video.duration}
                     </p>
                     {!video.url && (

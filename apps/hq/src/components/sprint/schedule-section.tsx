@@ -26,6 +26,7 @@ interface Props {
   template: SprintTemplatePublic | null;
   scheduleWithDates: ScheduleDayWithDate[];
   phaseInfo: PhaseInfo;
+  onSubmitWork: () => void;
 }
 
 export function ScheduleSection({
@@ -33,6 +34,7 @@ export function ScheduleSection({
   template,
   scheduleWithDates,
   phaseInfo,
+  onSubmitWork,
 }: Props) {
   const [expandedDay, setExpandedDay] = useState<number | null>(
     phaseInfo.activeDay
@@ -182,7 +184,9 @@ export function ScheduleSection({
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900">{day.topic}</p>
                   <p className="text-sm text-gray-500">
-                    {day.dayOfWeek}, {day.date} · {sessionTimeDisplay}
+                    {isDay4
+                      ? "Thursday or Friday \u00b7 You choose when booking"
+                      : `${day.dayOfWeek}, ${day.date} \u00b7 ${sessionTimeDisplay}`}
                   </p>
                 </div>
                 {isExpanded ? (
@@ -213,15 +217,16 @@ export function ScheduleSection({
                           </a>
                         )}
                         {template?.submit_work_url && (
-                          <a
-                            href={template.submit_work_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSubmitWork();
+                            }}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
                           >
                             <Upload size={14} />
                             Submit Work
-                          </a>
+                          </button>
                         )}
                       </div>
 

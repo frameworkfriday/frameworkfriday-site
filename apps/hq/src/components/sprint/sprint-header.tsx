@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Mail, Menu, X } from "lucide-react";
 import { useState } from "react";
 
@@ -22,21 +23,7 @@ export function SprintHeader({ dateRange }: Props) {
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                className="w-5 h-5 text-white"
-              >
-                <path
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
+            <Image src="/logo.svg" alt="Decision Sprint" width={32} height={32} className="text-gray-900" />
             <span className="font-semibold text-gray-900">
               Decision Sprint
             </span>

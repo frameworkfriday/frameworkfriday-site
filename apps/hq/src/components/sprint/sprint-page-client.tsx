@@ -16,6 +16,7 @@ import { TimeCommitment } from "./time-commitment";
 import { WhatToExpect } from "./what-to-expect";
 import { TroubleshootingFAQ } from "./troubleshooting-faq";
 import { TipsForSuccess } from "./tips-for-success";
+import { SubmitWorkDialog } from "./submit-work-dialog";
 
 interface Props {
   sprint: Sprint;
@@ -26,6 +27,7 @@ interface Props {
 
 export function SprintPageClient({ sprint, template, recaps, dateRange }: Props) {
   const [isFirstVisit, setIsFirstVisit] = useState(true);
+  const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const setupRef = useRef<HTMLDivElement>(null);
   const scheduleRef = useRef<HTMLDivElement>(null);
   const recapsRef = useRef<HTMLDivElement>(null);
@@ -102,6 +104,7 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
         sprint={sprint}
         phaseInfo={phaseInfo}
         onSetupClick={scrollToSetup}
+        onSubmitWork={() => setSubmitDialogOpen(true)}
       />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pb-20">
@@ -122,6 +125,7 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
                 template={template}
                 scheduleWithDates={scheduleWithDates}
                 phaseInfo={phaseInfo}
+                onSubmitWork={() => setSubmitDialogOpen(true)}
               />
             </div>
             <div ref={setupRef}>
@@ -146,6 +150,7 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
                 template={template}
                 scheduleWithDates={scheduleWithDates}
                 phaseInfo={phaseInfo}
+                onSubmitWork={() => setSubmitDialogOpen(true)}
               />
             </div>
             {hasRecaps && (
@@ -166,6 +171,13 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
         <TroubleshootingFAQ />
         <TipsForSuccess />
       </main>
+
+      <SubmitWorkDialog
+        open={submitDialogOpen}
+        onClose={() => setSubmitDialogOpen(false)}
+        embedUrl={template?.submit_work_embed_url ?? null}
+        directUrl={template?.submit_work_url ?? null}
+      />
     </div>
   );
 }

@@ -14,9 +14,10 @@ interface Props {
   sprint: Sprint;
   phaseInfo: PhaseInfo;
   onSetupClick: () => void;
+  onSubmitWork: () => void;
 }
 
-export function SprintNav({ template, sprint, phaseInfo, onSetupClick }: Props) {
+export function SprintNav({ template, sprint, phaseInfo, onSetupClick, onSubmitWork }: Props) {
   // Determine which zoom URL to show based on active day
   const getJoinUrl = () => {
     if (phaseInfo.activeDay === 1) return sprint.zoom_url_day1;
@@ -62,18 +63,16 @@ export function SprintNav({ template, sprint, phaseInfo, onSetupClick }: Props) 
         )}
 
         {submitUrl && (
-          <a
-            href={submitUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={onSubmitWork}
             className={cn(
-              "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
+              "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer",
               "bg-primary text-white hover:bg-primary-hover"
             )}
           >
             <Upload size={14} />
             Submit Work
-          </a>
+          </button>
         )}
       </div>
     </nav>

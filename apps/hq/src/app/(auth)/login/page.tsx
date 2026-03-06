@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -39,21 +40,7 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                className="w-7 h-7 text-white"
-              >
-                <path
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
+            <Image src="/logo.svg" alt="Decision Sprint" width={48} height={48} className="mx-auto mb-3" />
             <h1 className="text-xl font-bold text-gray-900">Sprint Admin</h1>
             <p className="text-sm text-gray-500 mt-1">
               Sign in to manage sprints and templates
