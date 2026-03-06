@@ -58,15 +58,7 @@ export function DailyRecaps({ recaps, scheduleWithDates, phaseInfo }: Props) {
   };
 
   return (
-    <section id="daily-recaps" className="mt-8">
-      <h2 className="text-2xl font-bold text-center text-gray-900">
-        Daily Recaps
-      </h2>
-      <p className="text-sm text-gray-500 text-center mt-1">
-        Tap a day to view the full recap
-      </p>
-
-      <div className="mt-6 space-y-3">
+    <div className="space-y-3">
         {dayEntries.map((entry) => {
           const isExpanded = expandedDay === entry.dayNumber;
           const isActive =
@@ -233,7 +225,6 @@ export function DailyRecaps({ recaps, scheduleWithDates, phaseInfo }: Props) {
             </div>
           );
         })}
-      </div>
-    </section>
+    </div>
   );
 }

@@ -19,7 +19,6 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   template: SprintTemplatePublic | null;
-  collapsed: boolean;
 }
 
 interface ChecklistItem {
@@ -64,8 +63,7 @@ const CHECKLIST_ITEMS: ChecklistItem[] = [
   },
 ];
 
-export function GettingSetUp({ template, collapsed: initialCollapsed }: Props) {
-  const [isCollapsed, setIsCollapsed] = useState(initialCollapsed);
+export function GettingSetUp({ template }: Props) {
   const [prepareOpen, setPrepareOpen] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
@@ -94,30 +92,8 @@ export function GettingSetUp({ template, collapsed: initialCollapsed }: Props) {
   const totalCount = CHECKLIST_ITEMS.filter((i) => !i.isBonus).length;
 
   return (
-    <section className="mt-12" id="getting-set-up">
-      {/* Collapsible wrapper for active/post-sprint */}
-      {initialCollapsed ? (
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-full border border-dashed border-gray-300 rounded-xl p-4 flex items-center justify-center gap-2 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
-        >
-          <Settings size={16} />
-          Getting Set Up
-          {isCollapsed ? (
-            <ChevronDown size={16} />
-          ) : (
-            <ChevronUp size={16} />
-          )}
-        </button>
-      ) : null}
-
-      {(!initialCollapsed || !isCollapsed) && (
-        <div className={initialCollapsed ? "mt-4" : ""}>
-          <h2 className="text-2xl font-bold text-center text-gray-900">
-            Getting Set Up
-          </h2>
-
-          {/* Progress bar */}
+    <div>
+      {/* Progress bar */}
           <div className="mt-4 max-w-md mx-auto">
             <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
               <span>Before Day 1 Checklist</span>
@@ -426,8 +402,6 @@ export function GettingSetUp({ template, collapsed: initialCollapsed }: Props) {
               </div>
             </div>
           )}
-        </div>
-      )}
-    </section>
+    </div>
   );
 }

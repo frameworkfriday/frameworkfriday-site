@@ -113,15 +113,7 @@ export function ScheduleSection({
     : "1:00 PM";
 
   return (
-    <section id="schedule" className="mt-12">
-      <h2 className="text-2xl font-bold text-center text-gray-900">
-        Your Schedule
-      </h2>
-      <p className="text-sm text-gray-500 text-center mt-1">
-        Times shown in your timezone ({shortTz}) · Tap a day for details
-      </p>
-
-      <div className="mt-6 space-y-3">
+    <div className="space-y-3">
         {scheduleWithDates.map((day) => {
           const isBuffer = !day.hasSession;
           const isDay4 = day.day === 4;
@@ -330,8 +322,7 @@ export function ScheduleSection({
             </div>
           );
         })}
-      </div>
-    </section>
+    </div>
   );
 }
 
