@@ -16,6 +16,7 @@ import { TimeCommitment } from "./time-commitment";
 import { WhatToExpect } from "./what-to-expect";
 import { TroubleshootingFAQ } from "./troubleshooting-faq";
 import { TipsForSuccess } from "./tips-for-success";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { SubmitWorkDialog } from "./submit-work-dialog";
 
 interface Props {
@@ -28,6 +29,7 @@ interface Props {
 export function SprintPageClient({ sprint, template, recaps, dateRange }: Props) {
   const [isFirstVisit, setIsFirstVisit] = useState(true);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [guideExpanded, setGuideExpanded] = useState(false);
   const setupRef = useRef<HTMLDivElement>(null);
   const scheduleRef = useRef<HTMLDivElement>(null);
   const recapsRef = useRef<HTMLDivElement>(null);
@@ -68,6 +70,7 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
       setIsFirstVisit(false);
     } else {
       localStorage.setItem("sprint-hq-visited", "true");
+      setGuideExpanded(true);
     }
 
     // Day 4 confetti
@@ -85,8 +88,7 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
   const publishedRecaps = recaps.filter((r) => r.is_published);
   const hasRecaps = publishedRecaps.length > 0;
 
-  // Always show recaps first when they exist
-  const showRecapsFirst = hasRecaps;
+  const showRecapsFirst = hasRecaps || phaseInfo.phase === "active" || phaseInfo.phase === "buffer" || phaseInfo.phase === "post-sprint";
 
   const scrollToSetup = () => {
     setupRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -99,6 +101,7 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
         template={template}
         sprint={sprint}
         phaseInfo={phaseInfo}
+        showRecaps={showRecapsFirst}
         onSetupClick={scrollToSetup}
         onSubmitWork={() => setSubmitDialogOpen(true)}
       />
@@ -162,10 +165,33 @@ export function SprintPageClient({ sprint, template, recaps, dateRange }: Props)
           </>
         )}
 
-        <TimeCommitment />
-        <WhatToExpect />
-        <TroubleshootingFAQ />
-        <TipsForSuccess />
+        {/* Sprint Guide — collapsed for returning users */}
+        <div className="mt-8">
+          <button
+            onClick={() => setGuideExpanded((prev) => !prev)}
+            className="w-full flex items-center justify-between cursor-pointer"
+          >
+            <h2 className="text-2xl font-bold text-gray-900">Sprint Guide</h2>
+            {guideExpanded ? (
+              <ChevronUp size={20} className="text-gray-400" />
+            ) : (
+              <ChevronDown size={20} className="text-gray-400" />
+            )}
+          </button>
+          {!guideExpanded && (
+            <p className="text-sm text-gray-500 mt-1">
+              Tap to view tips, FAQs, and what to expect
+            </p>
+          )}
+          {guideExpanded && (
+            <>
+              <TimeCommitment />
+              <WhatToExpect />
+              <TroubleshootingFAQ />
+              <TipsForSuccess />
+            </>
+          )}
+        </div>
       </main>
 
       <SubmitWorkDialog
