@@ -1,15 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
 import { AdminUsersList } from "@/components/admin/users/admin-users-list";
+import { listAdminUsers } from "@/lib/actions";
 
 export default async function AdminUsersPage() {
-  const supabase = await createClient();
-
-  const { data: adminRoles } = await supabase
-    .from("user_roles")
-    .select("id, user_id, role, created_at")
-    .eq("role", "admin")
-    .order("created_at", { ascending: true });
+  const admins = await listAdminUsers();
 
   return (
     <>
@@ -18,7 +12,7 @@ export default async function AdminUsersPage() {
         description="Manage who has access to the Sprint Admin panel."
       />
 
-      <AdminUsersList admins={adminRoles ?? []} />
+      <AdminUsersList admins={admins} />
     </>
   );
 }

@@ -2,29 +2,34 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { addAdminByEmail, removeAdmin } from "@/lib/actions";
+import type { AdminUser } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Shield, Info, Check, AlertCircle } from "lucide-react";
-
-interface AdminRole {
-  id: string;
-  user_id: string;
-  role: string;
-  created_at: string;
-}
+import {
+  Plus,
+  Trash2,
+  Shield,
+  Info,
+  ShieldCheck,
+  AlertCircle,
+  Mail,
+} from "lucide-react";
 
 interface AdminUsersListProps {
-  admins: AdminRole[];
+  admins: AdminUser[];
 }
 
 export function AdminUsersList({ admins }: AdminUsersListProps) {
   const router = useRouter();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newUserId, setNewUserId] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [adding, setAdding] = useState(false);
-  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [status, setStatus] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
@@ -34,41 +39,44 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
     });
   };
 
-  const addAdmin = async (e: React.FormEvent) => {
+  const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newUserId.trim()) return;
+    if (!newEmail.trim()) return;
     setAdding(true);
+    setStatus(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.from("user_roles").insert({
-      user_id: newUserId.trim(),
-      role: "admin",
-    });
+    const result = await addAdminByEmail(newEmail.trim());
 
-    if (error) {
-      setStatus({ type: "error", message: `Failed to add admin: ${error.message}` });
+    if ("error" in result) {
+      setStatus({ type: "error", message: result.error });
       setTimeout(() => setStatus(null), 5000);
     } else {
-      setNewUserId("");
+      setNewEmail("");
       setShowAddForm(false);
-      setStatus({ type: "success", message: "Admin added" });
+      setStatus({ type: "success", message: "Admin added successfully" });
       setTimeout(() => setStatus(null), 3000);
       router.refresh();
     }
     setAdding(false);
   };
 
-  const removeAdmin = async (id: string, userId: string) => {
+  const handleRemoveAdmin = async (roleId: string, name: string | null) => {
+    const displayName = name || "this user";
     if (
       !confirm(
-        `Remove admin access for user ${userId.slice(0, 8)}...? They won't be able to access the admin panel.`
+        `Remove admin access for ${displayName}? They won't be able to access the admin panel.`
       )
     )
       return;
 
-    const supabase = createClient();
-    await supabase.from("user_roles").delete().eq("id", id);
-    router.refresh();
+    const result = await removeAdmin(roleId);
+
+    if ("error" in result) {
+      setStatus({ type: "error", message: result.error });
+      setTimeout(() => setStatus(null), 5000);
+    } else {
+      router.refresh();
+    }
   };
 
   return (
@@ -81,8 +89,8 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
               {admins.length} admin{admins.length !== 1 ? "s" : ""}
             </p>
             {status?.type === "success" && (
-              <span className="flex items-center gap-1.5 text-sm text-success font-medium">
-                <Check size={16} />
+              <span className="flex items-center gap-1.5 text-sm text-success font-medium animate-fade-in">
+                <ShieldCheck size={16} />
                 {status.message}
               </span>
             )}
@@ -96,7 +104,10 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => {
+              setShowAddForm(!showAddForm);
+              setStatus(null);
+            }}
           >
             <Plus size={14} />
             Add Admin
@@ -106,20 +117,27 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
         {/* Add form */}
         {showAddForm && (
           <form
-            onSubmit={addAdmin}
+            onSubmit={handleAddAdmin}
             className="px-5 py-4 border-b border-gray-100 bg-gray-50"
           >
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              User ID (from Supabase Auth)
+              Email Address
             </label>
             <div className="flex items-center gap-2">
-              <Input
-                value={newUserId}
-                onChange={(e) => setNewUserId(e.target.value)}
-                placeholder="Enter user UUID..."
-                className="flex-1"
-                required
-              />
+              <div className="relative flex-1">
+                <Mail
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <Input
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="colleague@company.com"
+                  className="pl-9"
+                  required
+                />
+              </div>
               <Button type="submit" size="sm" disabled={adding}>
                 {adding ? "Adding..." : "Add"}
               </Button>
@@ -127,14 +145,17 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
                 type="button"
                 size="sm"
                 variant="ghost"
-                onClick={() => setShowAddForm(false)}
+                onClick={() => {
+                  setShowAddForm(false);
+                  setStatus(null);
+                }}
               >
                 Cancel
               </Button>
             </div>
             <p className="text-xs text-gray-400 mt-2">
-              The user must first sign in with Google to create their account.
-              Then add their user ID here.
+              The person must have signed in with Google at least once before
+              they can be added as an admin.
             </p>
           </form>
         )}
@@ -144,7 +165,7 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
           <thead>
             <tr className="border-b border-gray-100 text-left">
               <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                User ID
+                User
               </th>
               <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
                 Role
@@ -160,13 +181,37 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
           <tbody className="divide-y divide-gray-50">
             {admins.map((admin) => (
               <tr
-                key={admin.id}
+                key={admin.role_id}
                 className="hover:bg-gray-50/50 transition-colors"
               >
                 <td className="px-5 py-3.5">
-                  <code className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
-                    {admin.user_id}
-                  </code>
+                  <div className="flex items-center gap-3">
+                    {admin.avatar_url ? (
+                      <img
+                        src={admin.avatar_url}
+                        alt=""
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-xs font-medium text-gray-500">
+                          {(admin.full_name || admin.email || "?")
+                            .charAt(0)
+                            .toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      {admin.full_name && (
+                        <p className="text-sm font-medium text-gray-900">
+                          {admin.full_name}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500">
+                        {admin.email || admin.user_id.slice(0, 12) + "..."}
+                      </p>
+                    </div>
+                  </div>
                 </td>
                 <td className="px-5 py-3.5">
                   <Badge variant="default">
@@ -179,8 +224,11 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
                 </td>
                 <td className="px-5 py-3.5">
                   <button
-                    onClick={() => removeAdmin(admin.id, admin.user_id)}
+                    onClick={() =>
+                      handleRemoveAdmin(admin.role_id, admin.full_name)
+                    }
                     className="p-1.5 rounded-lg text-gray-400 hover:text-danger hover:bg-danger-light transition-colors cursor-pointer"
+                    title="Remove admin access"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -201,25 +249,18 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
             </h3>
             <ul className="text-sm text-blue-700 mt-2 space-y-1.5">
               <li>
-                1. A new admin signs in at{" "}
+                1. Have the new admin sign in at{" "}
                 <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">
                   /login
                 </code>{" "}
-                using Google OAuth.
+                using their Google account.
               </li>
               <li>
-                2. Their Supabase user ID is created automatically on first
-                sign-in.
+                2. Come back here and enter their email address above.
               </li>
               <li>
-                3. An existing admin adds their user ID to the{" "}
-                <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">
-                  user_roles
-                </code>{" "}
-                table above.
-              </li>
-              <li>
-                4. On next login, they&apos;ll have full access to the admin panel.
+                3. On their next visit, they&apos;ll have full access to the
+                admin panel.
               </li>
             </ul>
           </div>
