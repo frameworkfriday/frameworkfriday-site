@@ -2,20 +2,35 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/admin";
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = async () => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
-      },
-    });
+    setError(null);
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
+        },
+      });
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+      } else if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unknown error");
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,8 +81,11 @@ function LoginForm() {
                 fill="#EA4335"
               />
             </svg>
-            Sign in with Google
+            {loading ? "Redirecting..." : "Sign in with Google"}
           </button>
+          {error && (
+            <p className="mt-3 text-sm text-red-600 text-center">{error}</p>
+          )}
         </div>
       </div>
     </div>
