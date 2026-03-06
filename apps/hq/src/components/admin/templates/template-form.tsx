@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { SprintTemplate } from "@/lib/types/sprint";
-import { Save, Upload } from "lucide-react";
+import { Save, Upload, Check, AlertCircle } from "lucide-react";
 
 interface TemplateFormProps {
   template: SprintTemplate;
@@ -64,6 +64,7 @@ export function TemplateForm({ template }: TemplateFormProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [jsonError, setJsonError] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"saved" | null>(null);
 
   const handleFileUpload = async (
     bucket: string,
@@ -77,7 +78,8 @@ export function TemplateForm({ template }: TemplateFormProps) {
       .upload(filePath, file, { upsert: true });
 
     if (error) {
-      alert(`Upload failed: ${error.message}`);
+      setError(`Upload failed: ${error.message}`);
+      setTimeout(() => setError(null), 5000);
       return;
     }
 
@@ -132,6 +134,8 @@ export function TemplateForm({ template }: TemplateFormProps) {
     }
 
     setSaving(false);
+    setSaveStatus("saved");
+    setTimeout(() => setSaveStatus(null), 3000);
     router.refresh();
   };
 
@@ -402,12 +406,6 @@ export function TemplateForm({ template }: TemplateFormProps) {
       </div>
 
       {/* Actions */}
-      {error && (
-        <div className="p-3 bg-danger-light border border-danger/20 rounded-lg text-sm text-danger">
-          {error}
-        </div>
-      )}
-
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={saving}>
           <Save size={16} />
@@ -420,6 +418,18 @@ export function TemplateForm({ template }: TemplateFormProps) {
         >
           Cancel
         </Button>
+        {saveStatus === "saved" && (
+          <span className="flex items-center gap-1.5 text-sm text-success font-medium">
+            <Check size={16} />
+            Saved
+          </span>
+        )}
+        {error && (
+          <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
+            <AlertCircle size={16} />
+            {error}
+          </span>
+        )}
       </div>
     </form>
   );

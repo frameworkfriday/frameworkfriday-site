@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import type { Sprint } from "@/lib/types/sprint";
-import { Save } from "lucide-react";
+import { Save, Check, AlertCircle } from "lucide-react";
 
 const TIMEZONES = [
   "America/New_York",
@@ -73,6 +73,7 @@ export function SprintForm({ sprint, templates }: SprintFormProps) {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"saved" | null>(null);
 
   // Auto-generate title/slug when date changes (only for new sprints)
   const handleDateChange = (date: string) => {
@@ -128,8 +129,14 @@ export function SprintForm({ sprint, templates }: SprintFormProps) {
     }
 
     setSaving(false);
-    router.push("/admin/sprints");
-    router.refresh();
+    if (isEditing) {
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus(null), 3000);
+      router.refresh();
+    } else {
+      router.push("/admin/sprints");
+      router.refresh();
+    }
   };
 
   return (
@@ -305,12 +312,6 @@ export function SprintForm({ sprint, templates }: SprintFormProps) {
       )}
 
       {/* Actions */}
-      {error && (
-        <div className="mb-4 p-3 bg-danger-light border border-danger/20 rounded-lg text-sm text-danger">
-          {error}
-        </div>
-      )}
-
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={saving}>
           <Save size={16} />
@@ -323,6 +324,18 @@ export function SprintForm({ sprint, templates }: SprintFormProps) {
         >
           Cancel
         </Button>
+        {saveStatus === "saved" && (
+          <span className="flex items-center gap-1.5 text-sm text-success font-medium">
+            <Check size={16} />
+            Saved
+          </span>
+        )}
+        {error && (
+          <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
+            <AlertCircle size={16} />
+            {error}
+          </span>
+        )}
       </div>
     </form>
   );

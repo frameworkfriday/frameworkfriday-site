@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Shield, Info } from "lucide-react";
+import { Plus, Trash2, Shield, Info, Check, AlertCircle } from "lucide-react";
 
 interface AdminRole {
   id: string;
@@ -24,6 +24,7 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newUserId, setNewUserId] = useState("");
   const [adding, setAdding] = useState(false);
+  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
@@ -45,10 +46,13 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
     });
 
     if (error) {
-      alert(`Failed to add admin: ${error.message}`);
+      setStatus({ type: "error", message: `Failed to add admin: ${error.message}` });
+      setTimeout(() => setStatus(null), 5000);
     } else {
       setNewUserId("");
       setShowAddForm(false);
+      setStatus({ type: "success", message: "Admin added" });
+      setTimeout(() => setStatus(null), 3000);
       router.refresh();
     }
     setAdding(false);
@@ -72,9 +76,23 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
       {/* Admin list */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <p className="text-sm font-medium text-gray-700">
-            {admins.length} admin{admins.length !== 1 ? "s" : ""}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-sm font-medium text-gray-700">
+              {admins.length} admin{admins.length !== 1 ? "s" : ""}
+            </p>
+            {status?.type === "success" && (
+              <span className="flex items-center gap-1.5 text-sm text-success font-medium">
+                <Check size={16} />
+                {status.message}
+              </span>
+            )}
+            {status?.type === "error" && (
+              <span className="flex items-center gap-1.5 text-sm text-danger font-medium">
+                <AlertCircle size={16} />
+                {status.message}
+              </span>
+            )}
+          </div>
           <Button
             size="sm"
             variant="outline"
