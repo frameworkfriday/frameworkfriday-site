@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -10,6 +11,26 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // Check if this user's email is in the pending_admins list
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        const admin = createAdminClient();
+        const { data: pending } = await admin
+          .from("pending_admins")
+          .select("id")
+          .eq("email", user.email.toLowerCase())
+          .single();
+
+        if (pending) {
+          // Grant admin role and remove from pending
+          await admin.from("user_roles").insert({
+            user_id: user.id,
+            role: "admin",
+          });
+          await admin.from("pending_admins").delete().eq("id", pending.id);
+        }
+      }
+
       return NextResponse.redirect(`${origin}${next}`);
     }
     // Debug: show error

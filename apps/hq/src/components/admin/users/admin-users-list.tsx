@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { addAdminByEmail, removeAdmin } from "@/lib/actions";
-import type { AdminUser } from "@/lib/actions";
+import {
+  addAdminByEmail,
+  removeAdmin,
+  removePendingAdmin,
+} from "@/lib/actions";
+import type { AdminUser, PendingAdmin } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -15,13 +19,18 @@ import {
   ShieldCheck,
   AlertCircle,
   Mail,
+  Clock,
 } from "lucide-react";
 
 interface AdminUsersListProps {
   admins: AdminUser[];
+  pendingAdmins: PendingAdmin[];
 }
 
-export function AdminUsersList({ admins }: AdminUsersListProps) {
+export function AdminUsersList({
+  admins,
+  pendingAdmins,
+}: AdminUsersListProps) {
   const router = useRouter();
   const [showAddForm, setShowAddForm] = useState(false);
   const [newEmail, setNewEmail] = useState("");
@@ -53,8 +62,11 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
     } else {
       setNewEmail("");
       setShowAddForm(false);
-      setStatus({ type: "success", message: "Admin added successfully" });
-      setTimeout(() => setStatus(null), 3000);
+      const message = result.pending
+        ? "Admin pre-approved — they'll get access on first sign-in"
+        : "Admin added successfully";
+      setStatus({ type: "success", message });
+      setTimeout(() => setStatus(null), 5000);
       router.refresh();
     }
     setAdding(false);
@@ -79,6 +91,19 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
     }
   };
 
+  const handleRemovePending = async (id: string, email: string) => {
+    if (!confirm(`Remove pending admin invite for ${email}?`)) return;
+
+    const result = await removePendingAdmin(id);
+
+    if ("error" in result) {
+      setStatus({ type: "error", message: result.error });
+      setTimeout(() => setStatus(null), 5000);
+    } else {
+      router.refresh();
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Admin list */}
@@ -87,6 +112,12 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
           <div className="flex items-center gap-3">
             <p className="text-sm font-medium text-gray-700">
               {admins.length} admin{admins.length !== 1 ? "s" : ""}
+              {pendingAdmins.length > 0 && (
+                <span className="text-gray-400 font-normal">
+                  {" "}
+                  · {pendingAdmins.length} pending
+                </span>
+              )}
             </p>
             {status?.type === "success" && (
               <span className="flex items-center gap-1.5 text-sm text-success font-medium animate-fade-in">
@@ -154,8 +185,9 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
               </Button>
             </div>
             <p className="text-xs text-gray-400 mt-2">
-              The person must have signed in with Google at least once before
-              they can be added as an admin.
+              Enter any email — if they haven&apos;t signed in yet,
+              they&apos;ll be pre-approved and get admin access on their first
+              sign-in.
             </p>
           </form>
         )}
@@ -168,7 +200,7 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
                 User
               </th>
               <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Role
+                Status
               </th>
               <th className="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
                 Added
@@ -235,6 +267,48 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
                 </td>
               </tr>
             ))}
+            {pendingAdmins.map((pending) => (
+              <tr
+                key={pending.id}
+                className="hover:bg-gray-50/50 transition-colors bg-amber-50/30"
+              >
+                <td className="px-5 py-3.5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                      <Mail size={14} className="text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {pending.email}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Hasn&apos;t signed in yet
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-5 py-3.5">
+                  <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">
+                    <Clock size={10} className="mr-1" />
+                    Pending
+                  </Badge>
+                </td>
+                <td className="px-5 py-3.5 text-sm text-gray-500">
+                  {formatDate(pending.created_at)}
+                </td>
+                <td className="px-5 py-3.5">
+                  <button
+                    onClick={() =>
+                      handleRemovePending(pending.id, pending.email)
+                    }
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-danger hover:bg-danger-light transition-colors cursor-pointer"
+                    title="Remove pending admin"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -249,18 +323,15 @@ export function AdminUsersList({ admins }: AdminUsersListProps) {
             </h3>
             <ul className="text-sm text-blue-700 mt-2 space-y-1.5">
               <li>
-                1. Have the new admin sign in at{" "}
-                <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs">
-                  /login
-                </code>{" "}
-                using their Google account.
+                1. Enter the new admin&apos;s email address above.
               </li>
               <li>
-                2. Come back here and enter their email address above.
+                2. If they&apos;ve already signed in, they get access
+                immediately.
               </li>
               <li>
-                3. On their next visit, they&apos;ll have full access to the
-                admin panel.
+                3. If not, they&apos;ll be pre-approved and get admin access
+                automatically when they first sign in with Google.
               </li>
             </ul>
           </div>

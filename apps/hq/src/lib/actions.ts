@@ -66,13 +66,24 @@ export async function listAdminUsers(): Promise<AdminUser[]> {
   return users;
 }
 
-export async function addAdminByEmail(email: string): Promise<{ success: true } | { error: string }> {
-  await requireAdmin();
+export async function addAdminByEmail(email: string): Promise<{ success: true; pending?: boolean } | { error: string }> {
+  const currentUserId = await requireAdmin();
   const admin = createAdminClient();
 
-  // Find user by email using the admin API
-  // listUsers with a filter — Supabase admin API doesn't support email filter directly,
-  // so we list and find. For small user bases this is fine.
+  const normalizedEmail = email.toLowerCase();
+
+  // Check if already a pending admin
+  const { data: existingPending } = await admin
+    .from("pending_admins")
+    .select("id")
+    .eq("email", normalizedEmail)
+    .single();
+
+  if (existingPending) {
+    return { error: "This email is already in the pending admin list." };
+  }
+
+  // Try to find user by email in auth
   const { data: listData, error: listError } = await admin.auth.admin.listUsers({
     perPage: 1000,
   });
@@ -80,33 +91,39 @@ export async function addAdminByEmail(email: string): Promise<{ success: true } 
   if (listError) return { error: listError.message };
 
   const targetUser = listData.users.find(
-    (u) => u.email?.toLowerCase() === email.toLowerCase()
+    (u) => u.email?.toLowerCase() === normalizedEmail
   );
 
-  if (!targetUser) {
-    return { error: "No account found with that email. They need to sign in with Google first." };
+  if (targetUser) {
+    // User exists — grant admin role directly
+    const { data: existing } = await admin
+      .from("user_roles")
+      .select("id")
+      .eq("user_id", targetUser.id)
+      .eq("role", "admin")
+      .single();
+
+    if (existing) {
+      return { error: "This user is already an admin." };
+    }
+
+    const { error: insertError } = await admin.from("user_roles").insert({
+      user_id: targetUser.id,
+      role: "admin",
+    });
+
+    if (insertError) return { error: insertError.message };
+    return { success: true };
   }
 
-  // Check if already an admin
-  const { data: existing } = await admin
-    .from("user_roles")
-    .select("id")
-    .eq("user_id", targetUser.id)
-    .eq("role", "admin")
-    .single();
-
-  if (existing) {
-    return { error: "This user is already an admin." };
-  }
-
-  // Insert the role
-  const { error: insertError } = await admin.from("user_roles").insert({
-    user_id: targetUser.id,
-    role: "admin",
+  // User hasn't signed in yet — add to pending_admins
+  const { error: pendingError } = await admin.from("pending_admins").insert({
+    email: normalizedEmail,
+    added_by: currentUserId,
   });
 
-  if (insertError) return { error: insertError.message };
-  return { success: true };
+  if (pendingError) return { error: pendingError.message };
+  return { success: true, pending: true };
 }
 
 export async function removeAdmin(roleId: string): Promise<{ success: true } | { error: string }> {
@@ -125,6 +142,34 @@ export async function removeAdmin(roleId: string): Promise<{ success: true } | {
   }
 
   const { error } = await admin.from("user_roles").delete().eq("id", roleId);
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+export interface PendingAdmin {
+  id: string;
+  email: string;
+  created_at: string;
+}
+
+export async function listPendingAdmins(): Promise<PendingAdmin[]> {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  const { data, error } = await admin
+    .from("pending_admins")
+    .select("id, email, created_at")
+    .order("created_at", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function removePendingAdmin(id: string): Promise<{ success: true } | { error: string }> {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  const { error } = await admin.from("pending_admins").delete().eq("id", id);
   if (error) return { error: error.message };
   return { success: true };
 }

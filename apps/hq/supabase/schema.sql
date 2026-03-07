@@ -92,6 +92,14 @@ create table user_roles (
   unique(user_id, role)
 );
 
+-- Pending Admins (pre-registered emails before first sign-in)
+create table pending_admins (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  added_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now()
+);
+
 -- Global Assets (optional, for shared resources)
 create table global_assets (
   id uuid primary key default gen_random_uuid(),
@@ -202,6 +210,7 @@ alter table sprint_templates_public enable row level security;
 alter table sprints enable row level security;
 alter table sprint_daily_recaps enable row level security;
 alter table user_roles enable row level security;
+alter table pending_admins enable row level security;
 alter table global_assets enable row level security;
 
 -- Public read access for participant-facing data
@@ -244,6 +253,12 @@ create policy "Admins can read user_roles"
 
 create policy "Admins can manage user_roles"
   on user_roles for all
+  using (
+    auth.uid() in (select user_id from user_roles where role = 'admin')
+  );
+
+create policy "Admins can manage pending_admins"
+  on pending_admins for all
   using (
     auth.uid() in (select user_id from user_roles where role = 'admin')
   );
