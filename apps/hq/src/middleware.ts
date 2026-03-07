@@ -1,8 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
+const CANONICAL_HOST = "hq.frameworkfriday.ai";
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const host = request.headers.get("host") ?? "";
+
+  // Redirect non-canonical hosts (e.g. sprint-hq.vercel.app) to the branded domain
+  if (host !== CANONICAL_HOST && host !== "localhost:3000" && !host.startsWith("localhost:")) {
+    const url = new URL(request.url);
+    url.host = CANONICAL_HOST;
+    url.protocol = "https";
+    url.port = "";
+    return NextResponse.redirect(url, 308);
+  }
 
   // Public routes — no auth check
   if (
