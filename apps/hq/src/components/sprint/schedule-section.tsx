@@ -227,7 +227,7 @@ export function ScheduleSection({
                           <Link2 size={12} />
                           <span>Can&apos;t use the popup?</span>
                           <a
-                            href={template.submit_work_url}
+                            href="/submit"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="underline hover:text-gray-600"
@@ -237,7 +237,7 @@ export function ScheduleSection({
                           <button
                             onClick={() =>
                               navigator.clipboard.writeText(
-                                template.submit_work_url!
+                                `${window.location.origin}/submit`
                               )
                             }
                             className="p-0.5 hover:text-gray-600"

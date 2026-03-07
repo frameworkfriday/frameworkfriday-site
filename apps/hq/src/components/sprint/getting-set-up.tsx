@@ -115,7 +115,7 @@ export function GettingSetUp({ template }: Props) {
           {template?.project_kit_url && (
             <div className="mt-6 max-w-2xl mx-auto">
               <a
-                href={template.project_kit_url}
+                href="/resources/project-kit"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 bg-gray-900 text-white rounded-xl px-5 py-4 hover:bg-gray-800 transition-colors group"
@@ -141,7 +141,7 @@ export function GettingSetUp({ template }: Props) {
               let actionUrl = item.actionUrl || "#";
               let actionLabel = item.actionLabel;
               if (item.id === "companion" && template?.setup_companion_video_url) {
-                actionUrl = template.setup_companion_video_url;
+                actionUrl = "/resources/video-setup-companion";
               } else if (item.id === "calendar") {
                 actionUrl = "#schedule";
                 actionLabel = "View schedule";
@@ -346,53 +346,56 @@ export function GettingSetUp({ template }: Props) {
                   {
                     title: "Setting Up Your Companion",
                     duration: "~10 min",
-                    url: template.setup_companion_video_url,
+                    available: !!template.setup_companion_video_url,
+                    href: "/resources/video-setup-companion",
                   },
                   {
                     title: "Utilizing Conversation Starters",
                     duration: "~5 min",
-                    url: template.conversation_starters_video_url,
+                    available: !!template.conversation_starters_video_url,
+                    href: "/resources/video-conversation-starters",
                   },
                   {
                     title: "Completing Each Day's Workshop",
                     duration: "~5 min",
-                    url: template.daily_workflow_video_url,
+                    available: !!template.daily_workflow_video_url,
+                    href: "/resources/video-daily-workflow",
                   },
                 ].map((video) => (
                   <a
                     key={video.title}
-                    href={video.url || "#"}
+                    href={video.available ? video.href : "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
                       "block rounded-xl p-4 text-center transition-all card-hover",
-                      video.url
+                      video.available
                         ? "bg-gray-900 text-white hover:shadow-lg"
                         : "bg-gray-100 pointer-events-none opacity-60"
                     )}
                   >
                     <div className={cn(
                       "w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3",
-                      video.url ? "bg-primary/20" : "bg-gray-200"
+                      video.available ? "bg-primary/20" : "bg-gray-200"
                     )}>
                       <Play size={18} className={cn(
                         "ml-0.5",
-                        video.url ? "text-primary" : "text-gray-400"
+                        video.available ? "text-primary" : "text-gray-400"
                       )} />
                     </div>
                     <p className={cn(
                       "text-sm font-medium",
-                      video.url ? "text-white" : "text-gray-900"
+                      video.available ? "text-white" : "text-gray-900"
                     )}>
                       {video.title}
                     </p>
                     <p className={cn(
                       "text-xs mt-0.5",
-                      video.url ? "text-gray-400" : "text-gray-500"
+                      video.available ? "text-gray-400" : "text-gray-500"
                     )}>
                       {video.duration}
                     </p>
-                    {!video.url && (
+                    {!video.available && (
                       <p className="text-xs text-gray-400 mt-1 italic">
                         Coming soon
                       </p>

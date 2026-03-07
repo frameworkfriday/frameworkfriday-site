@@ -42,7 +42,7 @@ export function SubmitWorkDialog({ open, onClose, embedUrl, directUrl }: Props) 
             {directUrl && (
               <>
                 <a
-                  href={directUrl}
+                  href="/submit"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
@@ -52,7 +52,7 @@ export function SubmitWorkDialog({ open, onClose, embedUrl, directUrl }: Props) 
                   Open in new tab
                 </a>
                 <button
-                  onClick={() => navigator.clipboard.writeText(directUrl)}
+                  onClick={() => navigator.clipboard.writeText(`${window.location.origin}/submit`)}
                   className="p-1 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                   title="Copy link"
                 >
