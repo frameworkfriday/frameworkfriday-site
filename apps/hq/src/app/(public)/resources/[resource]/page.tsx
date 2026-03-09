@@ -27,26 +27,17 @@ export default async function ResourceRedirect({ params }: Props) {
 
   const supabase = await createClient();
 
-  // Get latest published sprint's template
-  const { data: sprint } = await supabase
-    .from("sprints")
-    .select("template_id")
-    .eq("status", "published")
-    .order("start_date", { ascending: false })
+  // Always read from the active template so branded links stay in sync
+  const { data: template } = await supabase
+    .from("sprint_templates_public")
+    .select(column)
+    .eq("is_active", true)
     .limit(1)
     .single();
 
-  if (sprint?.template_id) {
-    const { data: template } = await supabase
-      .from("sprint_templates_public")
-      .select(column)
-      .eq("id", sprint.template_id)
-      .single();
-
-    const url = template?.[column as keyof typeof template] as string | null;
-    if (url) {
-      redirect(url);
-    }
+  const url = template?.[column as keyof typeof template] as string | null;
+  if (url) {
+    redirect(url);
   }
 
   return (
