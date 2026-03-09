@@ -57,6 +57,19 @@ export function DailyRecaps({ recaps, scheduleWithDates, phaseInfo }: Props) {
     setExpandedDay(expandedDay === dayNumber ? null : dayNumber);
   };
 
+  const anyPublished = dayEntries.some((e) => e.isPublished);
+
+  if (!anyPublished) {
+    return (
+      <div className="rounded-xl border border-gray-100 bg-gray-50 px-6 py-10 text-center">
+        <p className="text-sm font-medium text-gray-500">Daily Recaps</p>
+        <p className="text-sm text-gray-400 mt-1">
+          Come back after the Day 1 session to see your daily recap.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
         {dayEntries.map((entry) => {

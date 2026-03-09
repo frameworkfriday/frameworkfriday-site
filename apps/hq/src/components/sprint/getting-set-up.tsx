@@ -59,6 +59,8 @@ const CHECKLIST_ITEMS: ChecklistItem[] = [
     description:
       "Optional but a game-changer for working with your Companion — and beyond (may require purchase)",
     actionLabel: "View",
+    actionUrl:
+      "https://docs.google.com/spreadsheets/d/1CyHZ2HS4DTrOgYNIZLa2_loQOFfNGXmbjL0Q2jfuqBE/edit?gid=755113335#gid=755113335",
     isBonus: true,
   },
 ];
