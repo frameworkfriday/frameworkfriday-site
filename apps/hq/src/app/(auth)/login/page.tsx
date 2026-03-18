@@ -12,6 +12,11 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(callbackError);
   const [loading, setLoading] = useState(false);
 
+  // Detect if we're being served through Forum HQ's proxy
+  const isProxied = typeof window !== "undefined" && window.location.hostname === "hq.frameworkfriday.ai";
+  // When proxied, auth callback must go through /sprint/ prefix so Forum HQ rewrites it back to Sprint HQ
+  const authCallbackPrefix = isProxied ? "/sprint" : "";
+
   const handleGoogleLogin = async () => {
     setError(null);
     setLoading(true);
@@ -20,7 +25,7 @@ function LoginForm() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
+          redirectTo: `${window.location.origin}${authCallbackPrefix}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
         },
       });
       if (error) {
