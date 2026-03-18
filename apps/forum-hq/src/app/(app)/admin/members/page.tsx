@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
-import { inviteUser, addMemberWithoutInvite } from "./actions";
+import AddMemberForm from "./AddMemberForm";
 
 export default async function AdminMembersPage() {
   const admin = createAdminClient();
@@ -77,84 +77,7 @@ export default async function AdminMembersPage() {
       </div>
 
       {/* Add Member Form */}
-      <div className="card" style={{ padding: "24px", marginBottom: "28px" }}>
-        <div style={{ fontWeight: 700, fontSize: "14px", color: "#0F0F0F", marginBottom: "16px" }}>
-          Add New Member
-        </div>
-        <form>
-          <div className="form-grid-6" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr", gap: "12px", alignItems: "flex-end", marginBottom: "16px" }}>
-            <div>
-              <label style={labelStyle}>Email *</label>
-              <input name="email" type="email" required placeholder="email@example.com" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>First Name</label>
-              <input name="first_name" type="text" placeholder="First" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Last Name</label>
-              <input name="last_name" type="text" placeholder="Last" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Business</label>
-              <input name="business_name" type="text" placeholder="Business name" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Group</label>
-              <select name="group_id" style={inputStyle}>
-                <option value="">No group</option>
-                {allGroups.map((g) => (
-                  <option key={g.id} value={g.id}>{g.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label style={labelStyle}>Role</label>
-              <select name="role" style={inputStyle}>
-                <option value="member">Member</option>
-                <option value="facilitator">Facilitator</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button
-              type="submit"
-              formAction={inviteUser}
-              style={{
-                padding: "8px 18px",
-                background: "#FF4F1A",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Add & Send Invite
-            </button>
-            <button
-              type="submit"
-              formAction={addMemberWithoutInvite}
-              style={{
-                padding: "8px 18px",
-                background: "none",
-                color: "#6E6E6E",
-                border: "1.5px solid #E5E5E5",
-                borderRadius: "6px",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Add Only (No Email)
-            </button>
-          </div>
-        </form>
-      </div>
+      <AddMemberForm groups={allGroups} />
 
       {/* Count */}
       <div style={{ fontSize: "12px", color: "#A3A3A3", fontWeight: 600, marginBottom: "12px" }}>

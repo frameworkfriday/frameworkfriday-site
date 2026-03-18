@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { notifyGroups, notifyAll } from "@/lib/notifications/create";
 
 export async function createPost(formData: FormData) {
@@ -155,6 +156,7 @@ export async function deletePost(formData: FormData) {
 
   await admin.from("posts").delete().eq("id", id);
   revalidatePath("/announcements");
+  redirect("/announcements");
 }
 
 export async function createComment(formData: FormData) {

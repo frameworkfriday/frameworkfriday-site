@@ -10,7 +10,7 @@ export async function inviteUser(formData: FormData) {
   const lastName = formData.get("last_name") as string;
   const businessName = formData.get("business_name") as string;
   const roleTitle = formData.get("role_title") as string;
-  const groupId = formData.get("group_id") as string | null;
+  const groupIds = formData.getAll("group_ids") as string[];
   const role = formData.get("role") as string | null;
 
   if (!email) return;
@@ -39,12 +39,12 @@ export async function inviteUser(formData: FormData) {
     await admin.from("user_roles").upsert({ user_id: userId, role: "admin" });
   }
 
-  // Assign to group if selected (with facilitator role if applicable)
-  if (groupId) {
+  // Assign to groups (with facilitator role if applicable)
+  for (const groupId of groupIds) {
     await admin.from("forum_group_members").upsert({
       user_id: userId,
       forum_group_id: groupId,
-      ...(role === "facilitator" ? { role: "facilitator" } : {}),
+      role: role === "facilitator" ? "facilitator" : "member",
     });
   }
 
@@ -58,7 +58,7 @@ export async function addMemberWithoutInvite(formData: FormData) {
   const lastName = formData.get("last_name") as string;
   const businessName = formData.get("business_name") as string;
   const roleTitle = formData.get("role_title") as string;
-  const groupId = formData.get("group_id") as string | null;
+  const groupIds = formData.getAll("group_ids") as string[];
   const role = formData.get("role") as string | null;
 
   if (!email) return;
@@ -92,12 +92,12 @@ export async function addMemberWithoutInvite(formData: FormData) {
     await admin.from("user_roles").upsert({ user_id: userId, role: "admin" });
   }
 
-  // Assign to group if selected (with facilitator role if applicable)
-  if (groupId) {
+  // Assign to groups (with facilitator role if applicable)
+  for (const groupId of groupIds) {
     await admin.from("forum_group_members").upsert({
       user_id: userId,
       forum_group_id: groupId,
-      ...(role === "facilitator" ? { role: "facilitator" } : {}),
+      role: role === "facilitator" ? "facilitator" : "member",
     });
   }
 
