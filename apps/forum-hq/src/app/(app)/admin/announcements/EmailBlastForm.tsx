@@ -10,10 +10,11 @@ interface Group {
 interface Props {
   groups: Group[];
   sendAction: (formData: FormData) => Promise<void>;
+  defaultExpanded?: boolean;
 }
 
-export default function EmailBlastForm({ groups, sendAction }: Props) {
-  const [expanded, setExpanded] = useState(false);
+export default function EmailBlastForm({ groups, sendAction, defaultExpanded = false }: Props) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [audience, setAudience] = useState("all");

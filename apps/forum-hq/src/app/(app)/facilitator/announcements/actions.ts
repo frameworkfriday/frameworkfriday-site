@@ -140,8 +140,7 @@ export async function sendFacilitatorEmail(formData: FormData) {
   const { data: members } = await admin
     .from("forum_group_members")
     .select("user_id, profiles(email)")
-    .eq("forum_group_id", forumGroupId)
-    .neq("user_id", user.id);
+    .eq("forum_group_id", forumGroupId);
 
   const emails = (members ?? [])
     .map((m) => (m.profiles as unknown as { email: string } | null)?.email)

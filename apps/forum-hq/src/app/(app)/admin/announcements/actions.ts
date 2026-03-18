@@ -157,8 +157,7 @@ export async function sendEmailBlast(formData: FormData) {
   if (audience === "all") {
     const { data: members } = await admin
       .from("forum_group_members")
-      .select("user_id, profiles(email)")
-      .neq("user_id", user.id);
+      .select("user_id, profiles(email)");
     const uniqueEmails = new Set<string>();
     (members ?? []).forEach((m) => {
       const p = m.profiles as unknown as { email: string } | null;
@@ -171,8 +170,7 @@ export async function sendEmailBlast(formData: FormData) {
       const { data: members } = await admin
         .from("forum_group_members")
         .select("user_id, profiles(email)")
-        .in("forum_group_id", groupIds)
-        .neq("user_id", user.id);
+        .in("forum_group_id", groupIds);
       const uniqueEmails = new Set<string>();
       (members ?? []).forEach((m) => {
         const p = m.profiles as unknown as { email: string } | null;
