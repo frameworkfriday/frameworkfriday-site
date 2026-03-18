@@ -155,15 +155,12 @@ export async function sendEmailBlast(formData: FormData) {
 
   let emails: string[] = [];
   if (audience === "all") {
-    const { data: members } = await admin
-      .from("forum_group_members")
-      .select("user_id, profiles(email)");
-    const uniqueEmails = new Set<string>();
-    (members ?? []).forEach((m) => {
-      const p = m.profiles as unknown as { email: string } | null;
-      if (p?.email) uniqueEmails.add(p.email);
-    });
-    emails = [...uniqueEmails];
+    // All non-archived members (from profiles, not just group members)
+    const { data: allProfiles } = await admin
+      .from("profiles")
+      .select("email")
+      .is("archived_at", null);
+    emails = (allProfiles ?? []).map((p) => p.email).filter(Boolean);
   } else {
     const groupIds = audience.split(",").filter(Boolean);
     if (groupIds.length > 0) {
