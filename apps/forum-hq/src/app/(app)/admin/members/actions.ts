@@ -11,6 +11,7 @@ export async function inviteUser(formData: FormData) {
   const businessName = formData.get("business_name") as string;
   const roleTitle = formData.get("role_title") as string;
   const groupId = formData.get("group_id") as string | null;
+  const role = formData.get("role") as string | null;
 
   if (!email) return;
 
@@ -33,11 +34,17 @@ export async function inviteUser(formData: FormData) {
     role_title: roleTitle || null,
   });
 
-  // Assign to group if selected
+  // Assign admin role if selected
+  if (role === "admin") {
+    await admin.from("user_roles").upsert({ user_id: userId, role: "admin" });
+  }
+
+  // Assign to group if selected (with facilitator role if applicable)
   if (groupId) {
     await admin.from("forum_group_members").upsert({
       user_id: userId,
       forum_group_id: groupId,
+      ...(role === "facilitator" ? { role: "facilitator" } : {}),
     });
   }
 
@@ -52,6 +59,7 @@ export async function addMemberWithoutInvite(formData: FormData) {
   const businessName = formData.get("business_name") as string;
   const roleTitle = formData.get("role_title") as string;
   const groupId = formData.get("group_id") as string | null;
+  const role = formData.get("role") as string | null;
 
   if (!email) return;
 
@@ -79,11 +87,17 @@ export async function addMemberWithoutInvite(formData: FormData) {
     role_title: roleTitle || null,
   });
 
-  // Assign to group if selected
+  // Assign admin role if selected
+  if (role === "admin") {
+    await admin.from("user_roles").upsert({ user_id: userId, role: "admin" });
+  }
+
+  // Assign to group if selected (with facilitator role if applicable)
   if (groupId) {
     await admin.from("forum_group_members").upsert({
       user_id: userId,
       forum_group_id: groupId,
+      ...(role === "facilitator" ? { role: "facilitator" } : {}),
     });
   }
 

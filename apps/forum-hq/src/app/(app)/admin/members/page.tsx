@@ -82,7 +82,7 @@ export default async function AdminMembersPage() {
           Add New Member
         </div>
         <form>
-          <div className="form-grid-5" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "12px", alignItems: "flex-end", marginBottom: "16px" }}>
+          <div className="form-grid-6" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr", gap: "12px", alignItems: "flex-end", marginBottom: "16px" }}>
             <div>
               <label style={labelStyle}>Email *</label>
               <input name="email" type="email" required placeholder="email@example.com" style={inputStyle} />
@@ -106,6 +106,14 @@ export default async function AdminMembersPage() {
                 {allGroups.map((g) => (
                   <option key={g.id} value={g.id}>{g.name}</option>
                 ))}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Role</label>
+              <select name="role" style={inputStyle}>
+                <option value="member">Member</option>
+                <option value="facilitator">Facilitator</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
           </div>
