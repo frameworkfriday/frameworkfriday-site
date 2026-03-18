@@ -23,9 +23,13 @@ export default async function ProfilePage() {
       .maybeSingle(),
   ]);
 
+  const hasPassword = user.app_metadata?.providers?.includes("email") ||
+    user.identities?.some((i: { provider: string }) => i.provider === "email") || false;
+
   return (
     <ProfileClient
       userId={user.id}
+      hasPassword={hasPassword}
       profile={{
         firstName: profile?.first_name ?? "",
         lastName: profile?.last_name ?? "",

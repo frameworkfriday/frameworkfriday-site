@@ -29,7 +29,12 @@ const nextConfig: NextConfig = {
           source: "/sprint-resources/:path*",
           destination: `${SPRINT_HQ_URL}/resources/:path*`,
         },
-        // Sprint admin
+        // Sprint admin (exact match)
+        {
+          source: "/sprint/admin",
+          destination: `${SPRINT_HQ_URL}/admin`,
+        },
+        // Sprint admin (sub-paths)
         {
           source: "/sprint/admin/:path*",
           destination: `${SPRINT_HQ_URL}/admin/:path*`,

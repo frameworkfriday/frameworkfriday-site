@@ -17,6 +17,7 @@ interface NotificationPrefs {
 
 interface Props {
   userId: string;
+  hasPassword: boolean;
   profile: {
     firstName: string;
     lastName: string;
@@ -84,7 +85,7 @@ function ToggleSwitch({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   );
 }
 
-export default function ProfileClient({ userId, profile, notificationPreferences }: Props) {
+export default function ProfileClient({ userId, hasPassword, profile, notificationPreferences }: Props) {
   const [firstName, setFirstName] = useState(profile.firstName);
   const [lastName, setLastName] = useState(profile.lastName);
   const [businessName, setBusinessName] = useState(profile.businessName);
@@ -110,6 +111,14 @@ export default function ProfileClient({ userId, profile, notificationPreferences
   const [inAppGroupPosts, setInAppGroupPosts] = useState(notificationPreferences.inAppGroupPosts);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifSaved, setNotifSaved] = useState(false);
+
+  // Password state
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordSet, setPasswordSet] = useState(hasPassword);
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -195,6 +204,39 @@ export default function ProfileClient({ userId, profile, notificationPreferences
     setNotifSaving(false);
     setNotifSaved(true);
     setTimeout(() => setNotifSaved(false), 3000);
+  };
+
+  const handlePasswordSubmit = async () => {
+    setPasswordError("");
+    setPasswordSuccess(false);
+
+    if (newPassword.length < 8) {
+      setPasswordError("Password must be at least 8 characters.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        setPasswordError(error.message);
+      } else {
+        setPasswordSuccess(true);
+        setPasswordSet(true);
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setPasswordSuccess(false), 3000);
+      }
+    } catch {
+      setPasswordError("Something went wrong. Please try again.");
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
   const initials = [firstName, lastName]
@@ -497,6 +539,94 @@ export default function ProfileClient({ userId, profile, notificationPreferences
                 }}
               >
                 {notifSaving ? "Saving..." : notifSaved ? "Saved!" : "Save notification settings"}
+              </button>
+            </div>
+          </div>
+
+          {/* Security Section */}
+          <div className="card animate-fade-up delay-5" style={{ padding: "24px 28px" }}>
+            <div style={{
+              fontSize: "14px", fontWeight: 700, color: "#0F0F0F",
+              marginBottom: "16px", paddingBottom: "12px",
+              borderBottom: "1px solid #F0F0EE",
+              display: "flex", alignItems: "center", gap: "8px",
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F0F0F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Security
+            </div>
+
+            <p style={{ fontSize: "12px", color: "#6E6E6E", margin: "0 0 18px", lineHeight: 1.4 }}>
+              {passwordSet
+                ? "Your password is set. You can update it below."
+                : "Set a password so you can sign in without a magic link."}
+            </p>
+
+            {passwordSuccess && (
+              <div style={{
+                padding: "10px 14px",
+                background: "#F0FDF4",
+                border: "1px solid #BBF7D0",
+                borderRadius: "8px",
+                fontSize: "13px",
+                color: "#166534",
+                marginBottom: "14px",
+              }}>
+                Password {passwordSet ? "updated" : "set"} successfully.
+              </div>
+            )}
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px", maxWidth: "400px" }}>
+              <div>
+                <label style={labelStyle}>New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => { setNewPassword(e.target.value); setPasswordError(""); }}
+                  placeholder="Enter new password"
+                  style={inputStyle}
+                />
+                <div style={{ fontSize: "11px", color: "#A3A3A3", marginTop: "4px" }}>
+                  At least 8 characters
+                </div>
+              </div>
+              <div>
+                <label style={labelStyle}>Confirm Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(""); }}
+                  placeholder="Confirm new password"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
+            {passwordError && (
+              <div style={{ fontSize: "12px", color: "#DC2626", marginTop: "8px" }}>
+                {passwordError}
+              </div>
+            )}
+
+            <div style={{ marginTop: "18px" }}>
+              <button
+                onClick={handlePasswordSubmit}
+                disabled={passwordLoading || !newPassword || !confirmPassword}
+                style={{
+                  padding: "10px 24px",
+                  background: passwordLoading || !newPassword || !confirmPassword ? "#FFAB8E" : "#FF4F1A",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  cursor: passwordLoading ? "wait" : (!newPassword || !confirmPassword) ? "not-allowed" : "pointer",
+                  transition: "background 0.2s",
+                }}
+              >
+                {passwordLoading ? "Saving..." : passwordSet ? "Update Password" : "Set Password"}
               </button>
             </div>
           </div>
