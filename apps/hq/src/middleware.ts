@@ -4,6 +4,13 @@ import { updateSession } from "@/lib/supabase/middleware";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Detect if this request is proxied through Forum HQ (hq.frameworkfriday.ai)
+  const forwardedHost = request.headers.get("x-forwarded-host") ?? "";
+  const isProxied = forwardedHost.includes("hq.frameworkfriday.ai");
+
+  // When proxied, login/auth paths are at /sprint/login and /sprint/auth
+  const loginPath = isProxied ? "/sprint/login" : "/login";
+
   // Public routes — no auth check
   if (
     pathname.startsWith("/login") ||
@@ -23,8 +30,8 @@ export async function middleware(request: NextRequest) {
   const { supabaseResponse, user, supabase } = await updateSession(request);
 
   if (!user) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirectTo", pathname);
+    const loginUrl = new URL(loginPath, request.url);
+    loginUrl.searchParams.set("redirectTo", isProxied ? `/sprint${pathname}` : pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -43,7 +50,7 @@ export async function middleware(request: NextRequest) {
     const roles = await roleRes.json();
 
     if (!Array.isArray(roles) || roles.length === 0) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL(loginPath, request.url));
     }
   }
 
