@@ -181,13 +181,16 @@ export async function sendEmailBlast(formData: FormData) {
 
   const template = emailBlastTemplate({ subject: subject.trim(), body: body.trim(), authorName });
 
+  let sentCount = 0;
   for (const email of emails) {
     try {
       await sendEmail(email, template.subject, template.html);
-    } catch {
-      // Continue on individual failure
+      sentCount++;
+    } catch (err) {
+      console.error(`[EmailBlast] Failed to send to ${email}:`, err);
     }
   }
+  console.log(`[EmailBlast] Sent ${sentCount}/${emails.length} emails for "${subject.trim()}"`)
 
   // Audit trail post
   const { data: post } = await admin.from("posts").insert({
