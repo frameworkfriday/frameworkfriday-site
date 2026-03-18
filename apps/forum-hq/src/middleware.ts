@@ -30,7 +30,8 @@ export async function middleware(request: NextRequest) {
     /^\/[a-z]+-\d+-\d{4}$/.test(pathname) ||
     pathname === "/submit" ||
     pathname.startsWith("/sprint-resources") ||
-    pathname.startsWith("/sprint/")
+    pathname.startsWith("/sprint/") ||
+    pathname === "/api/admin/test-email"
   ) {
     const { supabaseResponse } = await updateSession(request);
     return supabaseResponse;
