@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
         destination: "/terms-of-service",
         permanent: true,
       },
+      // Legacy .com paths that don't exist on .ai
+      {
+        source: "/join",
+        destination: "https://start.frameworkfriday.ai",
+        permanent: true,
+      },
     ];
   },
 };
