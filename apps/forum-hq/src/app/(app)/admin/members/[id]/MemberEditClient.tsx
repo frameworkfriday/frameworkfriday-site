@@ -39,6 +39,7 @@ interface Props {
     archived_at: string | null;
     created_at: string;
     onboarding_completed_at: string | null;
+    onboarding_path: string | null;
   };
   isAdmin: boolean;
   memberGroups: MemberGroup[];
@@ -53,6 +54,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
   const [linkedinUrl, setLinkedinUrl] = useState(member.linkedin_url ?? "");
   const [websiteUrl, setWebsiteUrl] = useState(member.website_url ?? "");
   const [communityVisible, setCommunityVisible] = useState(member.community_visible);
+  const [onboardingPath, setOnboardingPath] = useState(member.onboarding_path ?? "");
   const [avatarUrl, setAvatarUrl] = useState(member.avatar_url ?? "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -81,6 +83,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
     fd.set("linkedin_url", linkedinUrl);
     fd.set("website_url", websiteUrl);
     fd.set("community_visible", String(communityVisible));
+    fd.set("onboarding_path", onboardingPath);
     fd.set("avatar_url", avatarUrl);
     await updateMemberProfile(fd);
     setSaving(false);
@@ -268,9 +271,22 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
               <input value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="Company or practice" style={inputStyle} />
             </div>
 
-            <div style={{ marginBottom: "20px" }}>
-              <label style={labelStyle}>Role / Title</label>
-              <input value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)} placeholder="e.g. Founder & CEO" style={inputStyle} />
+            <div className="form-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "20px" }}>
+              <div>
+                <label style={labelStyle}>Role / Title</label>
+                <input value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)} placeholder="e.g. Founder & CEO" style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Onboarding Path</label>
+                <select
+                  value={onboardingPath}
+                  onChange={(e) => setOnboardingPath(e.target.value)}
+                  style={inputStyle}
+                >
+                  <option value="">New to Forum</option>
+                  <option value="ds-graduate">Decision Sprint Graduate</option>
+                </select>
+              </div>
             </div>
 
             {/* Social links */}
@@ -479,6 +495,12 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
                   {member.onboarding_completed_at
                     ? `Completed ${new Date(member.onboarding_completed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
                     : "Not completed"}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#6E6E6E" }}>Path</span>
+                <span style={{ color: member.onboarding_path === "ds-graduate" ? "#3B82F6" : "#A3A3A3", fontWeight: 500 }}>
+                  {member.onboarding_path === "ds-graduate" ? "DS Graduate" : "New to Forum"}
                 </span>
               </div>
               {member.archived_at && (

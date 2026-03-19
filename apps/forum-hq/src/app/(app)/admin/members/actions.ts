@@ -12,6 +12,7 @@ export async function inviteUser(formData: FormData) {
   const roleTitle = formData.get("role_title") as string;
   const groupIds = formData.getAll("group_ids") as string[];
   const role = formData.get("role") as string | null;
+  const onboardingPath = formData.get("onboarding_path") as string;
 
   if (!email) return;
 
@@ -32,6 +33,7 @@ export async function inviteUser(formData: FormData) {
     last_name: lastName || null,
     business_name: businessName || null,
     role_title: roleTitle || null,
+    onboarding_path: onboardingPath || null,
   });
 
   // Assign admin role if selected
@@ -60,6 +62,7 @@ export async function addMemberWithoutInvite(formData: FormData) {
   const roleTitle = formData.get("role_title") as string;
   const groupIds = formData.getAll("group_ids") as string[];
   const role = formData.get("role") as string | null;
+  const onboardingPath = formData.get("onboarding_path") as string;
 
   if (!email) return;
 
@@ -85,6 +88,7 @@ export async function addMemberWithoutInvite(formData: FormData) {
     last_name: lastName || null,
     business_name: businessName || null,
     role_title: roleTitle || null,
+    onboarding_path: onboardingPath || null,
   });
 
   // Assign admin role if selected

@@ -18,6 +18,7 @@ export async function updateMemberProfile(formData: FormData) {
     website_url: (formData.get("website_url") as string) || null,
     community_visible: formData.get("community_visible") === "true",
     avatar_url: (formData.get("avatar_url") as string) || null,
+    onboarding_path: (formData.get("onboarding_path") as string) || null,
   }).eq("id", userId);
 
   revalidatePath(`/admin/members/${userId}`);

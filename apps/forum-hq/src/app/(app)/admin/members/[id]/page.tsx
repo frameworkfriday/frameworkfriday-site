@@ -10,7 +10,7 @@ export default async function AdminMemberDetailPage({ params }: { params: Promis
     await Promise.all([
       admin
         .from("profiles")
-        .select("id, first_name, last_name, email, business_name, role_title, avatar_url, linkedin_url, website_url, community_visible, archived_at, created_at, onboarding_completed_at")
+        .select("id, first_name, last_name, email, business_name, role_title, avatar_url, linkedin_url, website_url, community_visible, archived_at, created_at, onboarding_completed_at, onboarding_path")
         .eq("id", id)
         .single(),
       admin.from("user_roles").select("user_id").eq("user_id", id).eq("role", "admin"),

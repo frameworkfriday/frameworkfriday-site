@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   const [{ data: profile }, { data: progressRows }, { data: allOnboardingItems }] = await Promise.all([
     admin
       .from("profiles")
-      .select("first_name, last_name, business_name, onboarding_completed_at")
+      .select("first_name, last_name, business_name, onboarding_completed_at, onboarding_path")
       .eq("id", user.id)
       .single(),
     admin
@@ -33,20 +33,27 @@ export default async function DashboardPage() {
       .eq("user_id", user.id),
     admin
       .from("onboarding_items")
-      .select("id, title, description, action_url, action_label, position, is_required")
+      .select("id, title, description, action_url, action_label, position, is_required, path")
       .order("position"),
   ]);
 
   const firstName = profile?.first_name || "Member";
 
-  // Build onboarding data
+  // Build onboarding data — filter items by member's onboarding path
+  const memberPath = profile?.onboarding_path ?? null;
   const completedIds = new Set(
     (progressRows ?? []).filter((r) => r.completed_at).map((r) => r.item_id)
   );
-  const onboardingItems = (allOnboardingItems ?? []).map((item) => ({
-    ...item,
-    done: completedIds.has(item.id),
-  }));
+  const onboardingItems = (allOnboardingItems ?? [])
+    .filter((item) => {
+      const itemPath = (item as { path: string | null }).path;
+      // Show item if: shared (path is null) OR matches this member's path
+      return itemPath === null || itemPath === memberPath;
+    })
+    .map((item) => ({
+      ...item,
+      done: completedIds.has(item.id),
+    }));
   const totalRequired = onboardingItems.filter((i) => i.is_required).length;
   const completedCount = onboardingItems.filter((i) => i.is_required && i.done).length;
   const hasIncompleteOnboarding = completedCount < totalRequired;

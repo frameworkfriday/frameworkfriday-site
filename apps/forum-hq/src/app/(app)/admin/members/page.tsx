@@ -7,7 +7,7 @@ export default async function AdminMembersPage() {
 
   const [{ data: profiles }, { data: adminRoles }, { data: memberships }, { data: groups }] =
     await Promise.all([
-      admin.from("profiles").select("id, first_name, last_name, email, business_name, role_title, archived_at").order("last_name"),
+      admin.from("profiles").select("id, first_name, last_name, email, business_name, role_title, archived_at, onboarding_path").order("last_name"),
       admin.from("user_roles").select("user_id, role").eq("role", "admin"),
       admin.from("forum_group_members").select("user_id, forum_group_id"),
       admin.from("forum_groups").select("id, name").order("name"),
@@ -138,6 +138,9 @@ export default async function AdminMembersPage() {
                     <span style={{ fontWeight: 600, fontSize: "14px", color: "#0F0F0F" }}>{fullName}</span>
                     {isAdmin && (
                       <span style={{ ...badgeBase, background: "rgba(255,79,26,0.1)", color: "#FF4F1A" }}>Admin</span>
+                    )}
+                    {member.onboarding_path === "ds-graduate" && (
+                      <span style={{ ...badgeBase, background: "rgba(59,130,246,0.08)", color: "#3B82F6" }}>DS Graduate</span>
                     )}
                   </div>
                   <div style={{ fontSize: "12px", color: "#6E6E6E" }}>

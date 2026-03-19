@@ -11,6 +11,7 @@ interface Group {
 export default function AddMemberForm({ groups }: { groups: Group[] }) {
   const [role, setRole] = useState("member");
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+  const [onboardingPath, setOnboardingPath] = useState("");
 
   const labelStyle = {
     fontSize: "11px",
@@ -60,12 +61,13 @@ export default function AddMemberForm({ groups }: { groups: Group[] }) {
           <input key={gid} type="hidden" name="group_ids" value={gid} />
         ))}
         <input type="hidden" name="role" value={role} />
+        <input type="hidden" name="onboarding_path" value={onboardingPath} />
 
         <div
-          className="form-grid-5"
+          className="form-grid-6"
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
+            gridTemplateColumns: "1.2fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr",
             gap: "12px",
             alignItems: "flex-end",
             marginBottom: "16px",
@@ -86,6 +88,17 @@ export default function AddMemberForm({ groups }: { groups: Group[] }) {
           <div>
             <label style={labelStyle}>Business</label>
             <input name="business_name" type="text" placeholder="Business name" style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Background</label>
+            <select
+              value={onboardingPath}
+              onChange={(e) => setOnboardingPath(e.target.value)}
+              style={inputStyle}
+            >
+              <option value="">New to Forum</option>
+              <option value="ds-graduate">DS Graduate</option>
+            </select>
           </div>
           <div>
             <label style={labelStyle}>Role</label>
