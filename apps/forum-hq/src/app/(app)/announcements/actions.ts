@@ -308,3 +308,54 @@ export async function togglePin(formData: FormData) {
   await admin.from("posts").update({ is_pinned: pinned }).eq("id", id);
   revalidatePath("/announcements");
 }
+
+export async function toggleReaction(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const admin = createAdminClient();
+  const postId = formData.get("post_id") as string;
+  const emoji = formData.get("emoji") as string;
+  if (!postId || !emoji) return;
+
+  // Check if reaction exists
+  const { data: existing } = await admin
+    .from("reactions")
+    .select("id")
+    .eq("post_id", postId)
+    .eq("user_id", user.id)
+    .eq("emoji", emoji)
+    .maybeSingle();
+
+  if (existing) {
+    await admin.from("reactions").delete().eq("id", existing.id);
+  } else {
+    await admin.from("reactions").insert({
+      post_id: postId,
+      user_id: user.id,
+      emoji,
+    });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/announcements");
+}
+
+export async function getPostComments(postId: string) {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("comments")
+    .select("id, body, created_at, edited_at, author_id, profiles:author_id(first_name, last_name, avatar_url)")
+    .eq("post_id", postId)
+    .order("created_at");
+
+  return (data ?? []).map((c) => ({
+    id: c.id,
+    body: c.body,
+    created_at: c.created_at,
+    edited_at: c.edited_at,
+    author_id: c.author_id,
+    author: c.profiles as unknown as { first_name: string; last_name: string; avatar_url: string | null } | null,
+  }));
+}

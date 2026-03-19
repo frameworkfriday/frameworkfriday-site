@@ -20,7 +20,7 @@ export default async function DashboardPage() {
 
   const admin = createAdminClient();
 
-  // Always fetch profile + onboarding progress (regardless of onboarding_completed_at)
+  // Core data
   const [{ data: profile }, { data: progressRows }, { data: allOnboardingItems }] = await Promise.all([
     admin
       .from("profiles")
@@ -47,7 +47,6 @@ export default async function DashboardPage() {
   const onboardingItems = (allOnboardingItems ?? [])
     .filter((item) => {
       const itemPath = (item as { path: string | null }).path;
-      // Show item if: shared (path is null) OR matches this member's path
       return itemPath === null || itemPath === memberPath;
     })
     .map((item) => ({
@@ -75,7 +74,7 @@ export default async function DashboardPage() {
     { data: resources },
     { data: unreadNotifs },
   ] = await Promise.all([
-    // Next upcoming sessions
+    // Next upcoming sessions (get 2)
     groupId
       ? admin
           .from("sessions")
@@ -86,7 +85,7 @@ export default async function DashboardPage() {
           .limit(2)
       : Promise.resolve({ data: [] as { id: string; title: string; description: string | null; starts_at: string; duration_minutes: number; video_call_url: string | null; session_type: string; google_event_id: string | null }[] }),
 
-    // Recent posts with full data for PostCards (5 posts)
+    // Recent posts with comments and reactions
     (async () => {
       let postQuery = admin
         .from("posts")
@@ -97,7 +96,7 @@ export default async function DashboardPage() {
         `)
         .order("is_pinned", { ascending: false })
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(10);
 
       if (groupId) {
         const { data: groupPostIds } = await admin
@@ -113,21 +112,55 @@ export default async function DashboardPage() {
       const { data: posts } = await postQuery;
       if (!posts || posts.length === 0) return [];
 
-      // Get comment counts
       const postIds = posts.map((p) => p.id);
-      const { data: counts } = await admin
-        .from("comments")
-        .select("post_id")
-        .in("post_id", postIds);
-      const commentCounts = (counts ?? []).reduce((acc, c) => {
-        acc[c.post_id] = (acc[c.post_id] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+
+      // Fetch comments, comment counts, and reactions in parallel
+      const [{ data: allComments }, { data: allReactions }] = await Promise.all([
+        admin
+          .from("comments")
+          .select("id, post_id, body, created_at, edited_at, author_id, profiles:author_id(first_name, last_name, avatar_url)")
+          .in("post_id", postIds)
+          .order("created_at"),
+        admin
+          .from("reactions")
+          .select("post_id, user_id, emoji")
+          .in("post_id", postIds),
+      ]);
+
+      // Group comments by post
+      const commentsByPost: Record<string, typeof allComments> = {};
+      for (const c of allComments ?? []) {
+        if (!commentsByPost[c.post_id]) commentsByPost[c.post_id] = [];
+        commentsByPost[c.post_id]!.push(c);
+      }
+
+      // Group reactions by post → emoji
+      const reactionsByPost: Record<string, Record<string, { count: number; reacted: boolean }>> = {};
+      for (const r of allReactions ?? []) {
+        if (!reactionsByPost[r.post_id]) reactionsByPost[r.post_id] = {};
+        if (!reactionsByPost[r.post_id][r.emoji]) reactionsByPost[r.post_id][r.emoji] = { count: 0, reacted: false };
+        reactionsByPost[r.post_id][r.emoji].count++;
+        if (r.user_id === user.id) reactionsByPost[r.post_id][r.emoji].reacted = true;
+      }
 
       return posts.map((p) => {
         const author = p.profiles as unknown as { first_name: string; last_name: string; avatar_url: string | null } | null;
         const audiences = (p.post_audiences as unknown as { forum_group_id: string; forum_groups: { name: string } | null }[]) ?? [];
         const groups = audiences.filter((a) => a.forum_groups).map((a) => ({ name: a.forum_groups!.name }));
+        const postComments = (commentsByPost[p.id] ?? []).map((c) => ({
+          id: c.id,
+          body: c.body,
+          created_at: c.created_at,
+          edited_at: c.edited_at,
+          author_id: c.author_id,
+          author: c.profiles as unknown as { first_name: string; last_name: string; avatar_url: string | null } | null,
+        }));
+        const postReactions = Object.entries(reactionsByPost[p.id] ?? {}).map(([emoji, data]) => ({
+          emoji,
+          count: data.count,
+          reacted: data.reacted,
+        }));
+
         return {
           id: p.id,
           title: p.title,
@@ -139,7 +172,9 @@ export default async function DashboardPage() {
           edited_at: p.edited_at,
           author,
           groups,
-          comment_count: commentCounts[p.id] || 0,
+          comment_count: postComments.length,
+          comments: postComments,
+          reactions: postReactions,
         };
       });
     })(),
@@ -207,10 +242,12 @@ export default async function DashboardPage() {
       })()
     : null;
 
+  const sessionType = nextSession ? (SESSION_TYPES[nextSession.session_type] ?? SESSION_TYPES.forum_session) : null;
+
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: "28px" }}>
+      <div style={{ marginBottom: "20px" }}>
         <div style={{
           fontSize: "11px", fontFamily: "var(--font-syne)", fontWeight: 600,
           textTransform: "uppercase", letterSpacing: "0.12em", color: "#FF4F1A", marginBottom: "6px",
@@ -230,82 +267,130 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {/* Quick stats strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", marginBottom: "20px" }}>
-        {/* Next session countdown */}
-        <div className="card animate-fade-up" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{
-            width: "36px", height: "36px", borderRadius: "10px",
-            background: "rgba(255,79,26,0.10)",
-            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF4F1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontSize: "11px", color: "#A3A3A3", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              Next Session
-            </div>
-            <div style={{ fontSize: "18px", fontWeight: 700, color: "#0F0F0F", lineHeight: 1.2 }}>
-              {sessionCountdown ?? "—"}
-            </div>
-          </div>
-        </div>
-
-        {/* Group member count */}
-        <div className="card animate-fade-up delay-1" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{
-            width: "36px", height: "36px", borderRadius: "10px",
-            background: "rgba(59,130,246,0.08)",
-            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontSize: "11px", color: "#A3A3A3", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              Forum Members
-            </div>
-            <div style={{ fontSize: "18px", fontWeight: 700, color: "#0F0F0F", lineHeight: 1.2 }}>
-              {members.length}
-            </div>
-          </div>
-        </div>
-
-        {/* Unread notifications */}
-        <Link href="/notifications" style={{ textDecoration: "none", color: "inherit" }}>
-          <div className="card animate-fade-up delay-2 card-hover" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px" }}>
+      {/* ─── NEXT SESSION — Top Priority ─── */}
+      {nextSession && sessionType ? (
+        <div className="card animate-fade-up" style={{
+          padding: "16px 20px", marginBottom: "16px",
+          display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap",
+          borderLeft: `3px solid ${sessionType.color}`,
+        }}>
+          {/* Countdown */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: "80px" }}>
             <div style={{
-              width: "36px", height: "36px", borderRadius: "10px",
-              background: unreadCount > 0 ? "rgba(255,79,26,0.10)" : "#F0F0F0",
+              width: "40px", height: "40px", borderRadius: "10px",
+              background: sessionType.bg,
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={unreadCount > 0 ? "#FF4F1A" : "#A3A3A3"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
+              <span style={{ fontSize: "14px", fontFamily: "var(--font-syne)", fontWeight: 800, color: sessionType.color }}>
+                {sessionCountdown}
+              </span>
             </div>
-            <div>
-              <div style={{ fontSize: "11px", color: "#A3A3A3", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                Notifications
-              </div>
-              <div style={{ fontSize: "18px", fontWeight: 700, color: unreadCount > 0 ? "#FF4F1A" : "#0F0F0F", lineHeight: 1.2 }}>
-                {unreadCount}
-              </div>
+          </div>
+
+          {/* Session info */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontFamily: "var(--font-syne)", fontWeight: 700, fontSize: "14px", color: "#0F0F0F" }}>
+                {nextSession.title}
+              </span>
+              <span style={{
+                fontSize: "9px", fontWeight: 600, padding: "2px 7px", borderRadius: "20px",
+                background: sessionType.bg, color: sessionType.color, letterSpacing: "0.04em", textTransform: "uppercase",
+              }}>
+                {sessionType.label}
+              </span>
             </div>
+            <div style={{ fontSize: "12px", color: "#6E6E6E", marginTop: "2px" }}>
+              {new Date(nextSession.starts_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+              {" at "}
+              {new Date(nextSession.starts_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+              {" · "}{nextSession.duration_minutes}min
+              {secondSession && (
+                <span style={{ color: "#C4C4C4" }}>
+                  {" · Then "}{secondSession.title}{" · "}
+                  {new Date(secondSession.starts_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* RSVP / Attendees */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+            {hasRsvp && confirmedMembers.length > 0 && (
+              <AvatarStack people={confirmedMembers} size={24} max={4} confirmedCount={confirmedMembers.length} totalCount={members.length} />
+            )}
+            {userRsvp === "accepted" ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 600, color: "#22C55E" }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                Going
+              </span>
+            ) : userRsvp === "tentative" ? (
+              <span style={{ fontSize: "12px", fontWeight: 600, color: "#EAB308" }}>Tentative</span>
+            ) : userRsvp === "declined" ? (
+              <span style={{ fontSize: "12px", fontWeight: 600, color: "#EF4444" }}>Declined</span>
+            ) : hasRsvp ? (
+              <Link href={`/sessions/${nextSession.id}`} style={{
+                padding: "6px 14px", borderRadius: "6px",
+                background: "#FF4F1A", color: "#FFF",
+                fontSize: "12px", fontWeight: 600, textDecoration: "none",
+              }}>
+                RSVP
+              </Link>
+            ) : null}
+            {nextSession.video_call_url && (
+              <a href={nextSession.video_call_url} target="_blank" rel="noopener noreferrer" style={{
+                padding: "6px 14px", borderRadius: "6px",
+                background: "#0F0F0F", color: "#FFF",
+                fontSize: "12px", fontWeight: 600, textDecoration: "none",
+              }}>
+                Join
+              </a>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="card animate-fade-up" style={{
+          padding: "14px 20px", marginBottom: "16px",
+          display: "flex", alignItems: "center", gap: "12px",
+        }}>
+          <div style={{
+            width: "36px", height: "36px", borderRadius: "10px",
+            background: "#F0F0F0",
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+          <div>
+            <div style={{ fontSize: "13px", fontWeight: 600, color: "#6E6E6E" }}>No upcoming sessions</div>
+            <div style={{ fontSize: "11px", color: "#A3A3A3" }}>Your facilitator will schedule sessions soon.</div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick stats */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+        <div className="card animate-fade-up delay-1" style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+          </svg>
+          <span style={{ fontSize: "14px", fontWeight: 700, color: "#0F0F0F" }}>{members.length}</span>
+          <span style={{ fontSize: "11px", color: "#A3A3A3" }}>members</span>
+        </div>
+        <Link href="/notifications" style={{ textDecoration: "none", color: "inherit", flex: 1 }}>
+          <div className="card animate-fade-up delay-2 card-hover" style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: "10px" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={unreadCount > 0 ? "#FF4F1A" : "#A3A3A3"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span style={{ fontSize: "14px", fontWeight: 700, color: unreadCount > 0 ? "#FF4F1A" : "#0F0F0F" }}>{unreadCount}</span>
+            <span style={{ fontSize: "11px", color: "#A3A3A3" }}>notifications</span>
           </div>
         </Link>
       </div>
 
-      {/* Onboarding widget — persistent when required items are incomplete */}
+      {/* Onboarding */}
       {hasIncompleteOnboarding && (
         <OnboardingWidget
           items={onboardingItems}
@@ -315,164 +400,33 @@ export default async function DashboardPage() {
         />
       )}
 
-      {/* 2-Column layout */}
-      <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: "20px", alignItems: "start" }}>
+      {/* 2-Column: Feed + Sidebar */}
+      <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" }}>
 
-        {/* ── LEFT COLUMN: Activity Feed ── */}
+        {/* ── FEED ── */}
         <div>
-          <div style={{
-            display: "flex", justifyContent: "space-between", alignItems: "center",
-            marginBottom: "14px", padding: "0 2px",
-          }}>
-            <div style={{
-              fontSize: "11px", fontFamily: "var(--font-syne)", fontWeight: 600,
-              textTransform: "uppercase", letterSpacing: "0.1em", color: "#A3A3A3",
-            }}>
-              Recent Activity
-            </div>
-          </div>
-          <DashboardFeed posts={feedPosts} />
+          <DashboardFeed posts={feedPosts} currentUserId={user.id} />
         </div>
 
-        {/* ── RIGHT COLUMN: Session + Group + Resources ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-
-          {/* Next Session */}
-          <div className="card animate-fade-up delay-1" style={{ padding: "22px 24px" }}>
-            <div style={{
-              fontSize: "11px", fontFamily: "var(--font-syne)", fontWeight: 600,
-              textTransform: "uppercase", letterSpacing: "0.1em", color: "#A3A3A3", marginBottom: "14px",
-            }}>
-              Next Session
-            </div>
-            {nextSession ? (() => {
-              const type = SESSION_TYPES[nextSession.session_type] ?? SESSION_TYPES.forum_session;
-              const d = new Date(nextSession.starts_at);
-              return (
-                <div>
-                  <div style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
-                    {/* Date block */}
-                    <div style={{
-                      width: "52px", flexShrink: 0, textAlign: "center",
-                      padding: "8px 6px", borderRadius: "10px", background: type.bg,
-                    }}>
-                      <div style={{ fontSize: "22px", fontFamily: "var(--font-syne)", fontWeight: 800, color: type.color, lineHeight: 1 }}>
-                        {d.getDate()}
-                      </div>
-                      <div style={{ fontSize: "10px", color: type.color, fontWeight: 600, letterSpacing: "0.05em", marginTop: "2px" }}>
-                        {d.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
-                      </div>
-                    </div>
-                    {/* Details */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: "var(--font-syne)", fontWeight: 700, fontSize: "15px", color: "#0F0F0F", marginBottom: "3px" }}>
-                        {nextSession.title}
-                      </div>
-                      <span style={{
-                        fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "20px",
-                        background: type.bg, color: type.color, letterSpacing: "0.04em", textTransform: "uppercase",
-                      }}>
-                        {type.label}
-                      </span>
-                      <div style={{ fontSize: "12px", color: "#6E6E6E", marginTop: "8px" }}>
-                        {d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                        {" at "}
-                        {d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                        {" · "}
-                        {nextSession.duration_minutes}min
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* RSVP */}
-                  {hasRsvp && (
-                    <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid #F0F0F0" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                        {userRsvp === "accepted" ? (
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 600, color: "#22C55E" }}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                            Confirmed
-                          </span>
-                        ) : userRsvp === "tentative" ? (
-                          <span style={{ fontSize: "12px", fontWeight: 600, color: "#EAB308" }}>Tentative</span>
-                        ) : userRsvp === "declined" ? (
-                          <span style={{ fontSize: "12px", fontWeight: 600, color: "#EF4444" }}>Declined</span>
-                        ) : (
-                          <Link href={`/sessions/${nextSession.id}`} style={{ fontSize: "12px", fontWeight: 600, color: "#FF4F1A", textDecoration: "none" }}>
-                            RSVP needed &rarr;
-                          </Link>
-                        )}
-                        {confirmedMembers.length > 0 && (
-                          <AvatarStack people={confirmedMembers} size={22} max={3} confirmedCount={confirmedMembers.length} totalCount={members.length} />
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Join call */}
-                  {nextSession.video_call_url && (
-                    <a
-                      href={nextSession.video_call_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: "inline-block", marginTop: "12px",
-                        padding: "8px 16px", background: "#FF4F1A", color: "white",
-                        borderRadius: "8px", fontSize: "13px", fontWeight: 600, textDecoration: "none",
-                      }}
-                    >
-                      Join Call
-                    </a>
-                  )}
-
-                  {/* Second session */}
-                  {secondSession && (
-                    <div style={{ marginTop: "14px", paddingTop: "12px", borderTop: "1px solid #F0F0F0", display: "flex", alignItems: "center", gap: "8px" }}>
-                      <div style={{ fontSize: "10px", color: "#A3A3A3", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Then</div>
-                      <div style={{ fontSize: "12px", color: "#6E6E6E" }}>
-                        {secondSession.title} &middot;{" "}
-                        {new Date(secondSession.starts_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                      </div>
-                    </div>
-                  )}
-
-                  <div style={{ marginTop: "12px" }}>
-                    <Link href="/sessions" style={{ fontSize: "12px", color: "#FF4F1A", fontWeight: 600, textDecoration: "none" }}>
-                      View all sessions &rarr;
-                    </Link>
-                  </div>
-                </div>
-              );
-            })() : (
-              <div style={{ textAlign: "center", padding: "12px 0" }}>
-                <div style={{ fontSize: "13px", color: "#A3A3A3" }}>No upcoming sessions</div>
-                <div style={{ fontSize: "11px", color: "#D5D5D5", marginTop: "4px" }}>Your facilitator will schedule sessions soon.</div>
-              </div>
-            )}
-          </div>
-
+        {/* ── SIDEBAR ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
           {/* Your Forum */}
-          <div className="card animate-fade-up delay-2" style={{ padding: "22px 24px" }}>
+          <div className="card animate-fade-up delay-1" style={{ padding: "18px 20px" }}>
             <div style={{
               fontSize: "11px", fontFamily: "var(--font-syne)", fontWeight: 600,
-              textTransform: "uppercase", letterSpacing: "0.1em", color: "#A3A3A3", marginBottom: "14px",
+              textTransform: "uppercase", letterSpacing: "0.1em", color: "#A3A3A3", marginBottom: "10px",
             }}>
               Your Forum
             </div>
             {group ? (
               <div>
-                <div style={{ fontFamily: "var(--font-syne)", fontWeight: 700, fontSize: "16px", color: "#0F0F0F", marginBottom: "4px" }}>
+                <div style={{ fontFamily: "var(--font-syne)", fontWeight: 700, fontSize: "15px", color: "#0F0F0F", marginBottom: "8px" }}>
                   {group.name}
                 </div>
-                {group.description && (
-                  <div style={{ fontSize: "13px", color: "#6E6E6E", marginBottom: "12px", lineHeight: 1.5 }}>
-                    {group.description}
-                  </div>
-                )}
                 {members.length > 0 && (
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                    <AvatarStack people={members} size={24} max={5} />
-                    <span style={{ fontSize: "12px", fontWeight: 600, color: "#6E6E6E" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+                    <AvatarStack people={members} size={22} max={5} />
+                    <span style={{ fontSize: "11px", fontWeight: 600, color: "#6E6E6E" }}>
                       {members.length} member{members.length !== 1 ? "s" : ""}
                     </span>
                   </div>
@@ -487,9 +441,9 @@ export default async function DashboardPage() {
           </div>
 
           {/* Resources */}
-          <div className="card animate-fade-up delay-3" style={{ padding: "22px 24px" }}>
+          <div className="card animate-fade-up delay-2" style={{ padding: "18px 20px" }}>
             <div style={{
-              display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px",
+              display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px",
             }}>
               <div style={{
                 fontSize: "11px", fontFamily: "var(--font-syne)", fontWeight: 600,
@@ -498,11 +452,11 @@ export default async function DashboardPage() {
                 Resources
               </div>
               <Link href="/resources" style={{ fontSize: "11px", color: "#FF4F1A", fontWeight: 600, textDecoration: "none" }}>
-                View all &rarr;
+                All &rarr;
               </Link>
             </div>
             {resources && resources.length > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 {resources.map((r) => (
                   <a
                     key={r.id}
@@ -510,36 +464,41 @@ export default async function DashboardPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
-                      display: "flex", alignItems: "center", gap: "10px",
-                      padding: "10px 12px", borderRadius: "8px", background: "#F7F7F6",
+                      display: "flex", alignItems: "center", gap: "8px",
+                      padding: "8px 10px", borderRadius: "6px", background: "#F7F7F6",
                       textDecoration: "none", transition: "background 0.15s",
                     }}
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#0F0F0F", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: "#0F0F0F", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {r.title}
                       </div>
-                      {r.description && (
-                        <div style={{ fontSize: "11px", color: "#A3A3A3", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: "1px" }}>
-                          {r.description}
-                        </div>
-                      )}
                     </div>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
+                      <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
                     </svg>
                   </a>
                 ))}
               </div>
             ) : (
-              <div style={{ textAlign: "center", padding: "12px 0" }}>
-                <div style={{ fontSize: "13px", color: "#A3A3A3" }}>No resources yet</div>
-                <div style={{ fontSize: "11px", color: "#D5D5D5", marginTop: "4px" }}>Resources will be added before your first session.</div>
-              </div>
+              <div style={{ fontSize: "12px", color: "#A3A3A3" }}>No resources yet.</div>
             )}
           </div>
+
+          {/* Sessions link */}
+          <Link href="/sessions" className="card card-hover animate-fade-up delay-3" style={{
+            padding: "14px 20px", display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "inherit",
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF4F1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#0F0F0F" }}>View all sessions</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "auto" }}>
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </Link>
         </div>
       </div>
     </div>
