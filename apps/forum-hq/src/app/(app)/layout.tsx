@@ -68,6 +68,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         markReadAction={markNotificationRead}
         markAllReadAction={markAllNotificationsRead}
       />
+      {/* Frosted top bar for mobile — sits behind hamburger */}
+      <div className="mobile-top-bar" />
       <main
         className="app-main"
         style={{

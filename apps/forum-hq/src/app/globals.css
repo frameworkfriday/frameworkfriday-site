@@ -195,6 +195,11 @@ h4 { font-weight: 600; }
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
 }
 
+/* Frosted top bar behind hamburger on mobile */
+.mobile-top-bar {
+  display: none;
+}
+
 .mobile-overlay {
   display: none;
 }
@@ -230,6 +235,20 @@ h4 { font-weight: 600; }
     display: flex;
   }
 
+  .mobile-top-bar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: rgba(247, 247, 246, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 998;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
   .mobile-overlay {
     display: block;
     position: fixed;
@@ -252,7 +271,28 @@ h4 { font-weight: 600; }
   }
 
   .app-main {
-    padding: 56px 16px 24px !important;
+    padding: 68px 16px 24px !important;
+  }
+
+  /* ── Login page mobile ── */
+  .login-container {
+    flex-direction: column !important;
+  }
+
+  .login-brand-panel {
+    display: none !important;
+  }
+
+  .login-form-panel {
+    min-height: 100vh;
+    padding: 24px 20px !important;
+  }
+
+  .login-mobile-logo {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
   }
 
   .form-grid-2,
@@ -302,7 +342,7 @@ h4 { font-weight: 600; }
 
   /* ── Messages mobile ── */
   .messages-container {
-    height: calc(100dvh - 100px) !important;
+    height: calc(100dvh - 116px) !important;
   }
 
   .message-bubble {

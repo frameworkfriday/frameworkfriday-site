@@ -80,10 +80,11 @@ function LoginForm() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", background: "#0F0F0F" }}>
+    <div className="login-container" style={{ minHeight: "100vh", display: "flex", background: "#0F0F0F" }}>
 
       {/* Left panel — brand */}
       <div
+        className="login-brand-panel"
         style={{
           width: "420px",
           minWidth: "420px",
@@ -172,6 +173,7 @@ function LoginForm() {
 
       {/* Right panel — login form */}
       <div
+        className="login-form-panel"
         style={{
           flex: 1,
           display: "flex",
@@ -183,10 +185,10 @@ function LoginForm() {
       >
         <div style={{ width: "100%", maxWidth: "400px" }}>
 
-          {/* Mobile logo — hidden on desktop via media query fallback */}
-          <div style={{ display: "none" }}>
+          {/* Mobile logo — visible only on mobile via CSS */}
+          <div className="login-mobile-logo" style={{ display: "none" }}>
             <Image src="/forum-icon.png" alt="Forum HQ" width={28} height={28} />
-            <span style={{ fontWeight: 700, fontSize: "14px" }}>
+            <span style={{ fontWeight: 700, fontSize: "14px", color: "#0F0F0F", letterSpacing: "0.04em" }}>
               FORUM HQ
             </span>
           </div>
