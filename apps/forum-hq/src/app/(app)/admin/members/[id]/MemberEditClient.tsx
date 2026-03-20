@@ -254,6 +254,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
     whiteSpace: "nowrap",
   });
 
+  const grid2Class = "form-grid-2";
   const grid2: React.CSSProperties = {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
@@ -261,6 +262,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
     marginBottom: "14px",
   };
 
+  const grid3Class = "form-grid-3";
   const grid3: React.CSSProperties = {
     display: "grid",
     gridTemplateColumns: "1fr 1fr 1fr",
@@ -317,7 +319,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "24px", alignItems: "start" }}>
+      <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "24px", alignItems: "start" }}>
         {/* Left column: Profile form */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
@@ -344,7 +346,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
               </div>
             </div>
 
-            <div style={grid2}>
+            <div className={grid2Class} style={grid2}>
               <div>
                 <label style={labelStyle}>First Name</label>
                 <input value={firstName} onChange={(e) => setFirstName(e.target.value)} style={inputStyle} />
@@ -361,7 +363,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
               <div style={{ fontSize: "11px", color: "#A3A3A3", marginTop: "4px" }}>Email is tied to authentication and cannot be changed here.</div>
             </div>
 
-            <div style={grid2}>
+            <div className={grid2Class} style={grid2}>
               <div>
                 <label style={labelStyle}>Phone</label>
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 123-4567" style={inputStyle} />
@@ -401,7 +403,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
               <label style={labelStyle}>Address Line 2</label>
               <input value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} placeholder="Suite 100" style={inputStyle} />
             </div>
-            <div style={grid3}>
+            <div className={grid3Class} style={grid3}>
               <div>
                 <label style={labelStyle}>City</label>
                 <input value={city} onChange={(e) => setCity(e.target.value)} style={inputStyle} />
@@ -415,7 +417,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
                 <input value={zip} onChange={(e) => setZip(e.target.value)} placeholder="33601" style={inputStyle} />
               </div>
             </div>
-            <div style={grid2}>
+            <div className={grid2Class} style={grid2}>
               <div>
                 <label style={labelStyle}>Country</label>
                 <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="United States" style={inputStyle} />
@@ -439,7 +441,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
               <input value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="Company or practice" style={inputStyle} />
             </div>
 
-            <div style={grid2}>
+            <div className={grid2Class} style={grid2}>
               <div>
                 <label style={labelStyle}>Role / Title</label>
                 <input value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)} placeholder="e.g. Founder & CEO" style={inputStyle} />
@@ -450,7 +452,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
               </div>
             </div>
 
-            <div style={grid2}>
+            <div className={grid2Class} style={grid2}>
               <div>
                 <label style={labelStyle}>Revenue Range</label>
                 <select value={revenueRange} onChange={(e) => setRevenueRange(e.target.value)} style={inputStyle}>
@@ -470,7 +472,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
             {/* Social links */}
             <div style={sectionDivider}>
               <div style={{ ...sectionTitle, fontSize: "12px", marginBottom: "12px" }}>Online Presence</div>
-              <div style={grid2}>
+              <div className={grid2Class} style={grid2}>
                 <div>
                   <label style={labelStyle}>LinkedIn URL</label>
                   <input value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/..." style={inputStyle} />
@@ -487,7 +489,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
           <div className="card" style={{ padding: "24px" }}>
             <div style={sectionTitle}>Membership</div>
 
-            <div style={grid2}>
+            <div className={grid2Class} style={grid2}>
               <div>
                 <label style={labelStyle}>Onboarding Path</label>
                 <select value={onboardingPath} onChange={(e) => setOnboardingPath(e.target.value)} style={inputStyle}>
