@@ -287,17 +287,28 @@ function CalendarView({ sessions }: { sessions: Session[] }) {
           const isSelected = day === selectedDay;
           const daySessions = day ? (sessionsByDay[day] ?? []) : [];
 
+          // Determine cell background based on session type
+          const hasForumSession = daySessions.some((s) => s.session_type === "forum_session");
+          const hasOfficeHours = daySessions.some((s) => s.session_type === "office_hours");
+          const cellBg = isSelected
+            ? "#0F0F0F"
+            : hasForumSession
+              ? "rgba(255,79,26,0.06)"
+              : hasOfficeHours
+                ? "rgba(110,110,110,0.05)"
+                : "#FFFFFF";
+
           return (
             <div
               key={i}
               onClick={() => day && hasSessions && setSelectedDay(isSelected ? null : day)}
               style={{
-                background: isSelected ? "#0F0F0F" : "#FFFFFF",
-                minHeight: "64px",
-                padding: "8px",
+                background: cellBg,
+                minHeight: "72px",
+                padding: "6px",
                 cursor: day && hasSessions ? "pointer" : "default",
                 position: "relative",
-                transition: "background 0.1s",
+                transition: "background 0.15s",
               }}
             >
               {day && (
@@ -313,28 +324,65 @@ function CalendarView({ sessions }: { sessions: Session[] }) {
                       justifyContent: "center",
                       fontSize: "12px",
                       fontFamily: "var(--font-syne)",
-                      fontWeight: isToday ? 700 : 400,
+                      fontWeight: isToday || hasSessions ? 700 : 400,
                       color: isSelected ? "#FFFFFF" : isToday ? "#FFFFFF" : "#0F0F0F",
                     }}
                   >
                     {day}
                   </div>
 
-                  {/* Session dots */}
+                  {/* Session type labels */}
                   {daySessions.length > 0 && (
-                    <div style={{ display: "flex", gap: "3px", flexWrap: "wrap", marginTop: "4px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: "3px" }}>
                       {daySessions.map((s) => {
                         const t = typeInfo(s.session_type);
+                        const isFS = s.session_type === "forum_session";
+                        const isOH = s.session_type === "office_hours";
                         return (
                           <div
                             key={s.id}
                             style={{
-                              width: "6px",
-                              height: "6px",
-                              borderRadius: "50%",
-                              background: isSelected ? "rgba(255,255,255,0.6)" : t.dot,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "3px",
+                              padding: "2px 4px",
+                              borderRadius: "4px",
+                              background: isSelected
+                                ? "rgba(255,255,255,0.15)"
+                                : isFS
+                                  ? "rgba(255,79,26,0.12)"
+                                  : isOH
+                                    ? "rgba(110,110,110,0.10)"
+                                    : "rgba(59,130,246,0.10)",
                             }}
-                          />
+                          >
+                            {/* Icon */}
+                            {isFS ? (
+                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={isSelected ? "rgba(255,255,255,0.8)" : t.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                              </svg>
+                            ) : isOH ? (
+                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={isSelected ? "rgba(255,255,255,0.8)" : t.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
+                              </svg>
+                            ) : (
+                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={isSelected ? "rgba(255,255,255,0.8)" : t.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                              </svg>
+                            )}
+                            <span style={{
+                              fontSize: "7px",
+                              fontWeight: 700,
+                              color: isSelected ? "rgba(255,255,255,0.8)" : t.color,
+                              letterSpacing: "0.02em",
+                              lineHeight: 1,
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}>
+                              {isFS ? "Forum" : isOH ? "Office Hrs" : "Ad Hoc"}
+                            </span>
+                          </div>
                         );
                       })}
                     </div>
