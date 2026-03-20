@@ -5,6 +5,7 @@ import Link from "next/link";
 import OnboardingWidget from "./OnboardingWidget";
 import DashboardFeed from "./DashboardFeed";
 import AvatarStack from "@/components/AvatarStack";
+import MembersSidebar from "@/components/MembersSidebar";
 import { getEventAttendees } from "@/lib/google/calendar";
 
 const SESSION_TYPES: Record<string, { label: string; color: string; bg: string }> = {
@@ -291,6 +292,8 @@ export default async function DashboardPage() {
 
   const nextSession = nextSessions?.[0] ?? null;
   const groupColor = group?.badge_color || "#FF4F1A";
+  const fullName = profile ? `${profile.first_name} ${profile.last_name ?? ""}`.trim() : "Member";
+  const userInitials = fullName.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase();
 
   // Fetch RSVP data for next session
   let rsvpMap: Record<string, string> = {};
@@ -350,18 +353,34 @@ export default async function DashboardPage() {
         <div style={{ padding: "28px 32px" }}>
           {/* Group info */}
           <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: nextSession ? "24px" : "0" }}>
-            {/* Group icon */}
+            {/* User avatar with group color ring */}
             <div style={{
-              width: "56px", height: "56px", borderRadius: "14px",
-              background: `${groupColor}10`,
-              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              width: "60px", height: "60px", borderRadius: "50%",
+              background: `linear-gradient(135deg, ${groupColor}, ${groupColor}88)`,
+              padding: "3px",
+              flexShrink: 0,
             }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={groupColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
+              {profile?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profile.avatar_url}
+                  alt={fullName}
+                  style={{
+                    width: "100%", height: "100%", borderRadius: "50%",
+                    objectFit: "cover", border: "2px solid #FFFFFF",
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: "100%", height: "100%", borderRadius: "50%",
+                  background: "#FFFFFF",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "20px", fontWeight: 700, color: groupColor,
+                  border: "2px solid #FFFFFF",
+                }}>
+                  {userInitials}
+                </div>
+              )}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
@@ -541,108 +560,25 @@ export default async function DashboardPage() {
 
         {/* ── SIDEBAR: Members + Resources ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {/* Members list */}
-          <div className="animate-fade-up delay-1" style={{
-            background: "#FFFFFF", borderRadius: "14px",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)",
-            padding: "20px",
-          }}>
-            <div style={{
-              fontSize: "12px", fontWeight: 700,
-              textTransform: "uppercase", letterSpacing: "0.06em", color: "#6E6E6E",
-              marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #F0F0EE",
+          {/* Members list with online presence */}
+          {groupId ? (
+            <MembersSidebar
+              members={members.map((m) => ({ user_id: m.user_id, profile: m.profile! }))}
+              currentUserId={user.id}
+              groupId={groupId}
+              groupColor={groupColor}
+            />
+          ) : (
+            <div className="animate-fade-up delay-1" style={{
+              background: "#FFFFFF", borderRadius: "14px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)",
+              padding: "20px",
             }}>
-              Forum Members
-            </div>
-
-            {members.length === 0 ? (
               <div style={{ fontSize: "13px", color: "#A3A3A3", textAlign: "center", padding: "20px 0" }}>
-                Members will appear here once assigned.
+                Members will appear here once you&apos;re assigned to a group.
               </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                {members.map((m, idx) => {
-                  const p = m.profile!;
-                  const name = `${p.first_name} ${p.last_name}`.trim() || "Member";
-                  const initials = name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
-                  const isYou = m.user_id === user.id;
-
-                  return (
-                    <div key={m.user_id} className={`animate-fade-up delay-${Math.min(idx + 1, 6)}`} style={{
-                      display: "flex", alignItems: "center", gap: "12px",
-                      padding: "10px 12px", borderRadius: "10px",
-                      transition: "background 0.15s ease",
-                      cursor: "default",
-                    }}>
-                      {p.avatar_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={p.avatar_url} alt={name}
-                          style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
-                        />
-                      ) : (
-                        <div style={{
-                          width: "36px", height: "36px", borderRadius: "50%",
-                          background: `${groupColor}10`,
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: "12px", fontWeight: 700, color: groupColor, flexShrink: 0,
-                        }}>
-                          {initials}
-                        </div>
-                      )}
-                      <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <span style={{
-                            fontSize: "13px", fontWeight: 600, color: "#0F0F0F",
-                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                          }}>
-                            {name}
-                          </span>
-                          {isYou && (
-                            <span style={{
-                              fontSize: "9px", fontWeight: 700, color: groupColor,
-                              background: `${groupColor}10`, padding: "1px 6px", borderRadius: "10px",
-                            }}>
-                              You
-                            </span>
-                          )}
-                        </div>
-                        {p.role_title && (
-                          <div style={{
-                            fontSize: "11px", color: "#A3A3A3", marginTop: "1px",
-                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                          }}>
-                            {p.role_title}
-                          </div>
-                        )}
-                      </div>
-                      {/* Social links */}
-                      <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-                        {p.linkedin_url && (
-                          <a href={p.linkedin_url} target="_blank" rel="noopener noreferrer" title="LinkedIn"
-                            style={{ color: "#C0C0C0", transition: "color 0.15s" }}>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                            </svg>
-                          </a>
-                        )}
-                        {p.website_url && (
-                          <a href={p.website_url} target="_blank" rel="noopener noreferrer" title="Website"
-                            style={{ color: "#C0C0C0", transition: "color 0.15s" }}>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <circle cx="12" cy="12" r="10" />
-                              <line x1="2" y1="12" x2="22" y2="12" />
-                              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                            </svg>
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Resources */}
           <div className="animate-fade-up delay-2" style={{
