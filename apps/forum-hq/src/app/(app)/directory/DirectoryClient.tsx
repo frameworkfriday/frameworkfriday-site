@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Profile {
   id: string;
@@ -14,8 +15,9 @@ interface Profile {
   website_url: string | null;
 }
 
-export default function DirectoryClient({ profiles, currentUserId, userGroups }: { profiles: Profile[]; currentUserId: string; userGroups: Record<string, { name: string; color: string }> }) {
+export default function DirectoryClient({ profiles, currentUserId, userGroups }: { profiles: Profile[]; currentUserId: string; userGroups: Record<string, { name: string; color: string; joinedAt: string }> }) {
   const [query, setQuery] = useState("");
+  const router = useRouter();
 
   const filtered = profiles.filter((p) => {
     const q = query.toLowerCase();
@@ -180,16 +182,21 @@ export default function DirectoryClient({ profiles, currentUserId, userGroups }:
                       {profile.email}
                     </div>
 
-                    {/* Forum group */}
+                    {/* Forum group + join date */}
                     {userGroups[profile.id] && (
-                      <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", marginTop: "6px" }}>
-                        <div style={{
-                          width: "6px", height: "6px", borderRadius: "50%",
-                          background: userGroups[profile.id].color,
-                          flexShrink: 0,
-                        }} />
-                        <span style={{ fontSize: "11px", fontWeight: 600, color: "#6E6E6E" }}>
-                          {userGroups[profile.id].name}
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px", flexWrap: "wrap" }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                          <div style={{
+                            width: "6px", height: "6px", borderRadius: "50%",
+                            background: userGroups[profile.id].color,
+                            flexShrink: 0,
+                          }} />
+                          <span style={{ fontSize: "11px", fontWeight: 600, color: "#6E6E6E" }}>
+                            {userGroups[profile.id].name}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: "11px", color: "#A3A3A3" }}>
+                          Joined {new Date(userGroups[profile.id].joinedAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
                         </span>
                       </div>
                     )}
@@ -230,6 +237,36 @@ export default function DirectoryClient({ profiles, currentUserId, userGroups }:
                           </a>
                         )}
                       </div>
+                    )}
+
+                    {/* Message button */}
+                    {!isYou && (
+                      <button
+                        onClick={() => router.push(`/messages?to=${profile.id}`)}
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: "6px",
+                          marginTop: "10px", padding: "6px 14px", borderRadius: "8px",
+                          border: "1px solid #EAEAE8", background: "#FAFAF8",
+                          fontSize: "12px", fontWeight: 600, color: "#0F0F0F",
+                          cursor: "pointer", transition: "all 0.15s ease",
+                          fontFamily: "inherit",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#FF4F1A";
+                          e.currentTarget.style.color = "#FFFFFF";
+                          e.currentTarget.style.borderColor = "#FF4F1A";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "#FAFAF8";
+                          e.currentTarget.style.color = "#0F0F0F";
+                          e.currentTarget.style.borderColor = "#EAEAE8";
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                        Message
+                      </button>
                     )}
                   </div>
                 </div>

@@ -19,7 +19,7 @@ export default async function DirectoryPage() {
       .order("last_name"),
     admin
       .from("forum_group_members")
-      .select("user_id, forum_group_id"),
+      .select("user_id, forum_group_id, joined_at"),
     admin
       .from("forum_groups")
       .select("id, name, badge_color"),
@@ -30,11 +30,11 @@ export default async function DirectoryPage() {
   for (const g of groups ?? []) {
     groupMap[g.id] = g;
   }
-  const userGroupMap: Record<string, { name: string; color: string }> = {};
+  const userGroupMap: Record<string, { name: string; color: string; joinedAt: string }> = {};
   for (const m of groupMemberships ?? []) {
     const g = groupMap[m.forum_group_id];
     if (g) {
-      userGroupMap[m.user_id] = { name: g.name, color: g.badge_color || "#6E6E6E" };
+      userGroupMap[m.user_id] = { name: g.name, color: g.badge_color || "#6E6E6E", joinedAt: (m as { joined_at: string }).joined_at };
     }
   }
 
