@@ -118,9 +118,12 @@ export default async function ConversationPage({
             transition: "background 0.15s ease",
           }}
         >
-          ←
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+          </svg>
         </Link>
         {otherProfile?.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={otherProfile.avatar_url}
             alt={otherName}
@@ -230,6 +233,7 @@ export default async function ConversationPage({
                     }}
                   >
                     {msg.sender.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={msg.sender.avatar_url}
                         alt={`${msg.sender.first_name} ${msg.sender.last_name}`}

@@ -108,6 +108,8 @@ export default function MembersSidebar({
           alignItems: "center",
           justifyContent: "space-between",
           marginBottom: "16px",
+          paddingBottom: "12px",
+          borderBottom: "1px solid #F0F0EE",
         }}
       >
         <span
