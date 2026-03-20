@@ -493,6 +493,7 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
                 <select value={onboardingPath} onChange={(e) => setOnboardingPath(e.target.value)} style={inputStyle}>
                   <option value="">New to Forum</option>
                   <option value="ds-graduate">Decision Sprint Graduate</option>
+                  <option value="internal-team">Internal Team</option>
                 </select>
               </div>
               <div>
@@ -664,8 +665,8 @@ export default function MemberEditClient({ member, isAdmin, memberGroups, allGro
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "#6E6E6E" }}>Path</span>
-                <span style={{ color: member.onboarding_path === "ds-graduate" ? "#3B82F6" : "#A3A3A3", fontWeight: 500 }}>
-                  {member.onboarding_path === "ds-graduate" ? "DS Graduate" : "New to Forum"}
+                <span style={{ color: member.onboarding_path === "ds-graduate" ? "#3B82F6" : member.onboarding_path === "internal-team" ? "#FF4F1A" : "#A3A3A3", fontWeight: 500 }}>
+                  {member.onboarding_path === "ds-graduate" ? "DS Graduate" : member.onboarding_path === "internal-team" ? "Internal Team" : "New to Forum"}
                 </span>
               </div>
               {member.archived_at && (

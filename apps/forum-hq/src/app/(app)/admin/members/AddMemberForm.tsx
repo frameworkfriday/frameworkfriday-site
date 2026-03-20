@@ -125,6 +125,7 @@ export default function AddMemberForm({ groups }: { groups: Group[] }) {
             >
               <option value="">New to Forum</option>
               <option value="ds-graduate">DS Graduate</option>
+              <option value="internal-team">Internal Team</option>
             </select>
           </div>
           <div>
