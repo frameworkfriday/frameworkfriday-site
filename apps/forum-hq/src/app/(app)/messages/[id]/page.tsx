@@ -80,13 +80,13 @@ export default async function ConversationPage({
 
   return (
     <div
-      className="animate-fade-up"
+      className="animate-fade-up messages-container"
       style={{
         maxWidth: 640,
         margin: "0 auto",
         display: "flex",
         flexDirection: "column",
-        height: "calc(100vh - 120px)",
+        height: "calc(100dvh - 120px)",
       }}
     >
       {/* Header */}
@@ -276,6 +276,7 @@ export default async function ConversationPage({
 
                 {/* Message bubble */}
                 <div
+                  className="message-bubble"
                   style={{
                     maxWidth: "75%",
                     padding: "10px 14px",

@@ -71,6 +71,7 @@ export default function ChatInput({
 
   return (
     <div
+      className="chat-input-container"
       style={{
         display: "flex",
         gap: 10,
@@ -85,6 +86,7 @@ export default function ChatInput({
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
         rows={1}
+        className="chat-input-textarea"
         style={{
           flex: 1,
           padding: "12px 16px",
@@ -112,6 +114,7 @@ export default function ChatInput({
       <button
         onClick={handleSend}
         disabled={!body.trim() || sending}
+        className="chat-send-btn"
         style={{
           padding: "12px 20px",
           borderRadius: 14,

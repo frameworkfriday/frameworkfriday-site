@@ -93,6 +93,7 @@ export default function MembersSidebar({
 
   return (
     <div
+      className="members-sidebar"
       style={{
         background: "#FFFFFF",
         borderRadius: "14px",
@@ -147,7 +148,7 @@ export default function MembersSidebar({
           return (
             <div
               key={member.user_id}
-              className={`animate-fade-up delay-${index}`}
+              className={`animate-fade-up delay-${index} member-card`}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -271,6 +272,7 @@ export default function MembersSidebar({
                 {/* Links */}
                 {(member.profile.linkedin_url || member.profile.website_url) && (
                   <div
+                    className="member-social-links"
                     style={{
                       display: "flex",
                       alignItems: "center",

@@ -266,6 +266,95 @@ h4 { font-weight: 600; }
   .session-detail-grid {
     grid-template-columns: 1fr !important;
   }
+
+  /* ── Group header mobile ── */
+  .group-header-card {
+    padding: 20px 16px !important;
+  }
+
+  .group-header-info {
+    gap: 14px !important;
+  }
+
+  .group-header-avatar {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .group-header-title {
+    font-size: 20px !important;
+  }
+
+  /* ── Session row mobile — stack vertically ── */
+  .session-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+
+  .session-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* ── Messages mobile ── */
+  .messages-container {
+    height: calc(100dvh - 100px) !important;
+  }
+
+  .message-bubble {
+    max-width: 88% !important;
+  }
+
+  .chat-input-container {
+    gap: 8px !important;
+  }
+
+  .chat-input-textarea {
+    padding: 10px 12px !important;
+    font-size: 16px !important; /* prevent iOS zoom */
+  }
+
+  .chat-send-btn {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* ── Members sidebar mobile — compact cards ── */
+  .members-sidebar {
+    padding: 16px !important;
+  }
+
+  .member-card {
+    padding: 6px !important;
+    gap: 8px !important;
+  }
+
+  .member-social-links {
+    display: none !important; /* hide on mobile — accessible via profile */
+  }
+}
+
+/* ── Small phones (< 375px) ── */
+@media (max-width: 375px) {
+  .app-main {
+    padding: 52px 12px 20px !important;
+  }
+
+  .group-header-card {
+    padding: 16px 12px !important;
+  }
+
+  .group-header-title {
+    font-size: 18px !important;
+  }
+
+  .member-badge {
+    display: none !important;
+  }
 }
 
 /* ── Noise texture overlay (depth) ── */

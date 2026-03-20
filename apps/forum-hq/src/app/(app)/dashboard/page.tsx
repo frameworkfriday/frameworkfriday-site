@@ -350,11 +350,11 @@ export default async function DashboardPage() {
       }}>
         {/* Color accent bar */}
         <div style={{ height: "4px", background: `linear-gradient(90deg, ${groupColor}, ${groupColor}66)` }} />
-        <div style={{ padding: "28px 32px" }}>
+        <div className="group-header-card" style={{ padding: "28px 32px" }}>
           {/* Group info */}
-          <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: nextSession ? "24px" : "0" }}>
+          <div className="group-header-info" style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: nextSession ? "24px" : "0" }}>
             {/* User avatar with group color ring */}
-            <div style={{
+            <div className="group-header-avatar" style={{
               width: "60px", height: "60px", borderRadius: "50%",
               background: `linear-gradient(135deg, ${groupColor}, ${groupColor}88)`,
               padding: "3px",
@@ -384,13 +384,13 @@ export default async function DashboardPage() {
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-                <h1 style={{
+                <h1 className="group-header-title" style={{
                   fontWeight: 700, fontSize: "24px", color: "#0F0F0F",
                   margin: 0, letterSpacing: "-0.02em",
                 }}>
                   {group?.name ?? "Your Group"}
                 </h1>
-                <span style={{
+                <span className="member-badge" style={{
                   fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px",
                   background: `${groupColor}10`, color: groupColor,
                   letterSpacing: "0.04em",
@@ -408,7 +408,7 @@ export default async function DashboardPage() {
 
           {/* Session row */}
           {nextSession && sessionType ? (
-            <div style={{
+            <div className="session-row" style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
               padding: "20px 24px",
               background: "#FAFAF8",
@@ -455,7 +455,7 @@ export default async function DashboardPage() {
               </div>
 
               {/* Actions */}
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+              <div className="session-actions" style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
                 {hasRsvp && confirmedMembers.length > 0 && (
                   <AvatarStack people={confirmedMembers} size={28} max={4} confirmedCount={confirmedMembers.length} totalCount={membersList.length} />
                 )}
