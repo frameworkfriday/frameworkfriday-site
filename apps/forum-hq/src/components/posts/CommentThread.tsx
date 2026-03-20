@@ -89,7 +89,7 @@ export default function CommentThread({
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "10px 14px",
-    borderRadius: "8px",
+    borderRadius: "10px",
     border: "1.5px solid #E5E5E5",
     background: "#FFFFFF",
     fontSize: "14px",
@@ -120,7 +120,7 @@ export default function CommentThread({
                 style={{
                   padding: "14px 12px",
                   borderBottom: "1px solid #F0F0EE",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   transition: "background 0.15s ease",
                   margin: "0 -12px",
                 }}
@@ -169,7 +169,7 @@ export default function CommentThread({
                             onClick={handleSaveEdit}
                             disabled={isPending}
                             style={{
-                              padding: "5px 14px", borderRadius: "6px", border: "none",
+                              padding: "5px 14px", borderRadius: "10px", border: "none",
                               background: "#FF4F1A", color: "#FFFFFF", fontSize: "12px",
                               fontWeight: 600, cursor: "pointer",
                             }}
@@ -179,7 +179,7 @@ export default function CommentThread({
                           <button
                             onClick={() => setEditingId(null)}
                             style={{
-                              padding: "5px 14px", borderRadius: "6px",
+                              padding: "5px 14px", borderRadius: "10px",
                               border: "1px solid #E5E5E5", background: "none",
                               fontSize: "12px", fontWeight: 600, color: "#6E6E6E", cursor: "pointer",
                             }}
@@ -243,7 +243,7 @@ export default function CommentThread({
           disabled={!newComment.trim() || isPending}
           style={{
             padding: "10px 20px",
-            borderRadius: "8px",
+            borderRadius: "10px",
             border: "none",
             background: newComment.trim() ? "#FF4F1A" : "#E5E5E5",
             color: newComment.trim() ? "#FFFFFF" : "#A3A3A3",

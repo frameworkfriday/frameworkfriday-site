@@ -76,7 +76,7 @@ export default async function FacilitatorMembersPage({
           </div>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1px", background: "#E5E5E5", borderRadius: "12px", overflow: "hidden" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1px", background: "#E5E5E5", borderRadius: "14px", overflow: "hidden" }}>
           {members.map((member, idx) => {
             const fullName = [member.first_name, member.last_name].filter(Boolean).join(" ") || member.email;
             const initial = (member.first_name || member.email || "?")[0].toUpperCase();
@@ -144,7 +144,7 @@ export default async function FacilitatorMembersPage({
                           fontFamily: "var(--font-syne)",
                           fontWeight: 600,
                           padding: "2px 7px",
-                          borderRadius: "20px",
+                          borderRadius: "10px",
                           background: "rgba(255,79,26,0.10)",
                           color: "#FF4F1A",
                           textTransform: "uppercase",

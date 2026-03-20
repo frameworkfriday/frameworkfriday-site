@@ -26,7 +26,7 @@ function isPast(iso: string) { return new Date(iso) < new Date(); }
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 14px",
-  borderRadius: "8px",
+  borderRadius: "10px",
   border: "1.5px solid #E5E5E5",
   background: "#FFFFFF",
   fontSize: "14px",
@@ -174,7 +174,7 @@ export default async function FacilitatorSessionsPage({
             type="submit"
             style={{
               padding: "10px 24px",
-              borderRadius: "8px",
+              borderRadius: "10px",
               border: "none",
               background: "#0F0F0F",
               color: "#FFFFFF",
@@ -225,7 +225,7 @@ export default async function FacilitatorSessionsPage({
                     flexShrink: 0,
                     textAlign: "center",
                     padding: "6px",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     background: past ? "#F7F7F6" : type.bg,
                     border: `1px solid ${past ? "#E5E5E5" : "transparent"}`,
                   }}
@@ -251,7 +251,7 @@ export default async function FacilitatorSessionsPage({
                         fontWeight: 600,
                         letterSpacing: "0.06em",
                         padding: "2px 7px",
-                        borderRadius: "20px",
+                        borderRadius: "10px",
                         background: type.bg,
                         color: type.color,
                         textTransform: "uppercase",
@@ -268,7 +268,7 @@ export default async function FacilitatorSessionsPage({
                 {/* Facilitator override */}
                 <div style={{ flexShrink: 0 }}>
                   {session.facilitator_id ? (
-                    <span style={{ fontSize: "11px", fontWeight: 600, color: "#3B82F6", background: "rgba(59,130,246,0.08)", padding: "3px 8px", borderRadius: "20px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 600, color: "#3B82F6", background: "rgba(59,130,246,0.08)", padding: "3px 8px", borderRadius: "10px" }}>
                       Fill-in: {groupMembers.find((m) => m.id === session.facilitator_id)?.name ?? "Assigned"}
                     </span>
                   ) : (

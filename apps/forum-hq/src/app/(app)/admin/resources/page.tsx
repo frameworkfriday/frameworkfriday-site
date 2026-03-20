@@ -12,7 +12,7 @@ const CATEGORIES = [
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 14px",
-  borderRadius: "8px",
+  borderRadius: "10px",
   border: "1.5px solid #E5E5E5",
   background: "#FFFFFF",
   fontSize: "14px",
@@ -106,7 +106,7 @@ export default async function AdminResourcesPage() {
             type="submit"
             style={{
               padding: "10px 24px",
-              borderRadius: "8px",
+              borderRadius: "10px",
               border: "none",
               background: "#0F0F0F",
               color: "#FFFFFF",

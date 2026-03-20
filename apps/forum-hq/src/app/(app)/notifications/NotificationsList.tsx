@@ -99,7 +99,7 @@ export default function NotificationsList({ notifications, markReadAction, markA
           padding: "48px 24px",
           textAlign: "center",
           background: "white",
-          borderRadius: "12px",
+          borderRadius: "14px",
           border: "1px solid #E8E8E6",
         }}>
           <div style={{ fontSize: "14px", color: "#A3A3A3" }}>No notifications yet</div>
@@ -110,7 +110,7 @@ export default function NotificationsList({ notifications, markReadAction, markA
       ) : (
         <div style={{
           background: "white",
-          borderRadius: "12px",
+          borderRadius: "14px",
           border: "1px solid #E8E8E6",
           overflow: "hidden",
         }}>

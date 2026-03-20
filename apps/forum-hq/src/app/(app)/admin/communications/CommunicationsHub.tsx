@@ -114,7 +114,7 @@ const inputStyle: React.CSSProperties = {
   padding: "8px 12px",
   fontSize: "13px",
   border: "1px solid #E5E5E5",
-  borderRadius: "8px",
+  borderRadius: "10px",
   fontFamily: "inherit",
   color: "#0F0F0F",
   background: "#FFFFFF",
@@ -316,7 +316,7 @@ export default function CommunicationsHub({
                 color: "#6E6E6E",
                 padding: "8px 12px",
                 background: "#F7F7F6",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 marginBottom: "16px",
               }}
             >

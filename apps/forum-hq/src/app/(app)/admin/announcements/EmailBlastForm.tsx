@@ -100,7 +100,7 @@ export default function EmailBlastForm({ groups, sendAction, defaultExpanded = f
           <button
             onClick={() => setAudience("all")}
             style={{
-              padding: "5px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 600,
+              padding: "5px 12px", borderRadius: "10px", fontSize: "12px", fontWeight: 600,
               border: `1.5px solid ${audience === "all" ? "#FF4F1A" : "#E5E5E5"}`,
               background: audience === "all" ? "rgba(255,79,26,0.06)" : "white",
               color: audience === "all" ? "#FF4F1A" : "#6E6E6E",
@@ -112,7 +112,7 @@ export default function EmailBlastForm({ groups, sendAction, defaultExpanded = f
           <button
             onClick={() => setAudience("groups")}
             style={{
-              padding: "5px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 600,
+              padding: "5px 12px", borderRadius: "10px", fontSize: "12px", fontWeight: 600,
               border: `1.5px solid ${audience === "groups" ? "#FF4F1A" : "#E5E5E5"}`,
               background: audience === "groups" ? "rgba(255,79,26,0.06)" : "white",
               color: audience === "groups" ? "#FF4F1A" : "#6E6E6E",
@@ -154,7 +154,7 @@ export default function EmailBlastForm({ groups, sendAction, defaultExpanded = f
           placeholder="Email subject line"
           style={{
             width: "100%", padding: "9px 12px", fontSize: "14px",
-            border: "1px solid #E5E5E5", borderRadius: "8px",
+            border: "1px solid #E5E5E5", borderRadius: "10px",
             fontFamily: "inherit", color: "#0F0F0F", background: "#FFFFFF",
             boxSizing: "border-box", outline: "none",
           }}
@@ -173,7 +173,7 @@ export default function EmailBlastForm({ groups, sendAction, defaultExpanded = f
           rows={5}
           style={{
             width: "100%", padding: "10px 12px", fontSize: "14px",
-            border: "1px solid #E5E5E5", borderRadius: "8px",
+            border: "1px solid #E5E5E5", borderRadius: "10px",
             fontFamily: "inherit", color: "#0F0F0F", background: "#FFFFFF",
             boxSizing: "border-box", outline: "none", resize: "vertical",
             lineHeight: 1.5,
@@ -189,7 +189,7 @@ export default function EmailBlastForm({ groups, sendAction, defaultExpanded = f
             padding: "10px 20px",
             background: sent ? "#22C55E" : canSend ? "#FF4F1A" : "#E5E5E5",
             color: canSend || sent ? "white" : "#A3A3A3",
-            border: "none", borderRadius: "8px",
+            border: "none", borderRadius: "10px",
             fontSize: "13px", fontWeight: 700,
             cursor: canSend && !isPending ? "pointer" : "default",
           }}

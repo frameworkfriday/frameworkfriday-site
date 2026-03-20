@@ -140,7 +140,7 @@ export default function AddMemberForm({ groups }: { groups: Group[] }) {
                       onClick={() => toggleGroup(g.id)}
                       style={{
                         padding: "7px 14px",
-                        borderRadius: "8px",
+                        borderRadius: "10px",
                         fontSize: "13px",
                         fontWeight: 600,
                         cursor: "pointer",

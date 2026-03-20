@@ -154,7 +154,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
               flexShrink: 0,
               textAlign: "center",
               padding: "12px 8px",
-              borderRadius: "12px",
+              borderRadius: "14px",
               background: isPast ? "#F7F7F6" : type.bg,
               border: `1px solid ${isPast ? "#E5E5E5" : "transparent"}`,
             }}
@@ -180,7 +180,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                   fontWeight: 600,
                   letterSpacing: "0.06em",
                   padding: "3px 10px",
-                  borderRadius: "20px",
+                  borderRadius: "10px",
                   background: type.bg,
                   color: type.color,
                   textTransform: "uppercase",
@@ -189,7 +189,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                 {type.label}
               </span>
               {isPast && (
-                <span style={{ fontSize: "11px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px", background: "#F0F0F0", color: "#A3A3A3" }}>
+                <span style={{ fontSize: "11px", fontWeight: 600, padding: "3px 10px", borderRadius: "10px", background: "#F0F0F0", color: "#A3A3A3" }}>
                   Past
                 </span>
               )}
@@ -231,7 +231,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                 alignItems: "center",
                 gap: "6px",
                 padding: "10px 20px",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 background: "#FF4F1A",
                 color: "#FFFFFF",
                 fontSize: "14px",
@@ -279,7 +279,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                     return p && rsvpMap[p.email.toLowerCase()] === "accepted";
                   }).length;
                   return (
-                    <span style={{ fontSize: "11px", fontWeight: 600, color: "#22C55E", background: "#F0FDF4", padding: "2px 8px", borderRadius: "20px", letterSpacing: "normal", textTransform: "none" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 600, color: "#22C55E", background: "#F0FDF4", padding: "2px 8px", borderRadius: "10px", letterSpacing: "normal", textTransform: "none" }}>
                       {confirmed} confirmed
                     </span>
                   );
@@ -300,7 +300,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                   };
                   const rsvpInfo = rsvp ? rsvpConfig[rsvp] : null;
                   return (
-                    <div key={m.user_id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px", borderRadius: "8px", background: "#F7F7F6" }}>
+                    <div key={m.user_id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px", borderRadius: "10px", background: "#F7F7F6" }}>
                       {p.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={p.avatar_url} alt={name} style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
@@ -314,7 +314,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                           {name}
                         </div>
                         {m.role === "facilitator" && (
-                          <span style={{ fontSize: "9px", fontWeight: 600, color: "#FF4F1A", background: "rgba(255,79,26,0.10)", padding: "1px 5px", borderRadius: "20px", display: "inline-block", marginTop: "2px" }}>
+                          <span style={{ fontSize: "9px", fontWeight: 600, color: "#FF4F1A", background: "rgba(255,79,26,0.10)", padding: "1px 5px", borderRadius: "10px", display: "inline-block", marginTop: "2px" }}>
                             Facilitator
                           </span>
                         )}
@@ -370,7 +370,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                     <div style={{ fontSize: "12px", color: "#6E6E6E" }}>{facilitator.business_name}</div>
                   )}
                   {isOverride && (
-                    <span style={{ fontSize: "10px", fontWeight: 600, color: "#3B82F6", background: "rgba(59,130,246,0.08)", padding: "1px 6px", borderRadius: "20px", marginTop: "4px", display: "inline-block" }}>
+                    <span style={{ fontSize: "10px", fontWeight: 600, color: "#3B82F6", background: "rgba(59,130,246,0.08)", padding: "1px 6px", borderRadius: "10px", marginTop: "4px", display: "inline-block" }}>
                       Fill-in
                     </span>
                   )}

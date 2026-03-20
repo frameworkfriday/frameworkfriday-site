@@ -161,20 +161,20 @@ export default async function FacilitatorAnnouncementsPage({
           <div style={{ margin: "14px 0" }}>
             <label style={{ display: "block", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "#6E6E6E", marginBottom: "6px" }}>Subject *</label>
             <input name="subject" type="text" required placeholder="Email subject" style={{
-              width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1.5px solid #E5E5E5",
+              width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1.5px solid #E5E5E5",
               background: "#FFFFFF", fontSize: "14px", color: "#0F0F0F", fontFamily: "inherit", outline: "none", boxSizing: "border-box",
             }} />
           </div>
           <div style={{ marginBottom: "14px" }}>
             <label style={{ display: "block", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "#6E6E6E", marginBottom: "6px" }}>Message *</label>
             <textarea name="body" rows={4} required placeholder="Write your email..." style={{
-              width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1.5px solid #E5E5E5",
+              width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1.5px solid #E5E5E5",
               background: "#FFFFFF", fontSize: "14px", color: "#0F0F0F", fontFamily: "inherit", outline: "none", boxSizing: "border-box",
               resize: "vertical", lineHeight: 1.6,
             }} />
           </div>
           <button type="submit" style={{
-            padding: "10px 20px", borderRadius: "8px", border: "none",
+            padding: "10px 20px", borderRadius: "10px", border: "none",
             background: "#FF4F1A", color: "#FFFFFF", fontSize: "13px", fontWeight: 700, cursor: "pointer",
           }}>
             Send Email

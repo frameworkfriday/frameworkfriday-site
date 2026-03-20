@@ -109,7 +109,7 @@ export default async function ResourcesPage() {
             style={{
               width: "48px",
               height: "48px",
-              borderRadius: "12px",
+              borderRadius: "14px",
               background: "rgba(255,79,26,0.10)",
               display: "flex",
               alignItems: "center",

@@ -64,7 +64,7 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "10px 14px",
-    borderRadius: "8px",
+    borderRadius: "10px",
     border: "1.5px solid #E5E5E5",
     background: "#FFFFFF",
     fontSize: "14px",
@@ -196,7 +196,7 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
         <div style={{ marginBottom: "20px" }}>
           <label style={labelStyle}>Apply to Groups *</label>
           <div style={{
-            border: "1.5px solid #E5E5E5", borderRadius: "8px", overflow: "hidden",
+            border: "1.5px solid #E5E5E5", borderRadius: "10px", overflow: "hidden",
           }}>
             {/* All groups toggle */}
             <div
@@ -209,7 +209,7 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
               }}
             >
               <div style={{
-                width: "18px", height: "18px", borderRadius: "4px",
+                width: "18px", height: "18px", borderRadius: "14px",
                 border: `2px solid ${allSelected ? "#FF4F1A" : "#D4D4D4"}`,
                 background: allSelected ? "#FF4F1A" : "transparent",
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -241,7 +241,7 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
                   }}
                 >
                   <div style={{
-                    width: "18px", height: "18px", borderRadius: "4px",
+                    width: "18px", height: "18px", borderRadius: "14px",
                     border: `2px solid ${checked ? "#FF4F1A" : "#D4D4D4"}`,
                     background: checked ? "#FF4F1A" : "transparent",
                     display: "flex", alignItems: "center", justifyContent: "center",
@@ -267,7 +267,7 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
           disabled={count === 0 || submitting}
           style={{
             padding: "10px 24px",
-            borderRadius: "8px",
+            borderRadius: "10px",
             border: "none",
             background: count > 0 ? "#FF4F1A" : "#E5E5E5",
             color: count > 0 ? "#FFFFFF" : "#A3A3A3",

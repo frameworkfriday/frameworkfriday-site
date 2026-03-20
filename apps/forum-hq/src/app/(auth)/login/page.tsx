@@ -518,7 +518,7 @@ function LoginForm() {
                   style={{
                     marginTop: "16px",
                     padding: "12px 14px",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     background: "#FEF2F2",
                     border: "1px solid #FCA5A5",
                     fontSize: "13px",

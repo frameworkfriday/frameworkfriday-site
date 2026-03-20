@@ -58,7 +58,7 @@ function ToggleSwitch({ on, onToggle }: { on: boolean; onToggle: () => void }) {
       style={{
         width: "40px",
         height: "22px",
-        borderRadius: "11px",
+        borderRadius: "10px",
         border: "none",
         background: on ? "#FF4F1A" : "#D4D4D4",
         cursor: "pointer",
@@ -249,7 +249,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
     padding: "10px 12px",
     fontSize: "14px",
     border: "1px solid #E5E5E5",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontFamily: "inherit",
     color: "#0F0F0F",
     background: "#FFFFFF",
@@ -333,7 +333,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
                   onClick={() => document.getElementById("profile-photo-input")?.click()}
                   style={{
                     padding: "8px 16px", background: "#F0F0F0", color: "#0F0F0F",
-                    border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
+                    border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 600,
                     cursor: "pointer", transition: "background 0.15s",
                   }}
                 >
@@ -344,7 +344,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
                     onClick={() => setAvatarUrl("")}
                     style={{
                       padding: "8px 16px", background: "none", color: "#A3A3A3",
-                      border: "1px solid #E5E5E5", borderRadius: "8px", fontSize: "13px",
+                      border: "1px solid #E5E5E5", borderRadius: "10px", fontSize: "13px",
                       cursor: "pointer", transition: "border-color 0.15s",
                     }}
                   >
@@ -360,7 +360,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
 
             {/* Cropper */}
             {imgSrc && (
-              <div style={{ marginTop: "20px", padding: "16px", background: "#F7F7F6", borderRadius: "12px" }}>
+              <div style={{ marginTop: "20px", padding: "16px", background: "#F7F7F6", borderRadius: "14px" }}>
                 <ReactCrop
                   crop={crop}
                   onChange={(c) => setCrop(c)}
@@ -378,7 +378,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
                     disabled={uploading || !completedCrop}
                     style={{
                       padding: "8px 20px", background: "#FF4F1A", color: "white",
-                      border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
+                      border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 600,
                       cursor: uploading ? "wait" : "pointer",
                     }}
                   >
@@ -388,7 +388,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
                     onClick={() => { setImgSrc(""); setCrop(undefined); }}
                     style={{
                       padding: "8px 20px", background: "#F0F0F0", color: "#0F0F0F",
-                      border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer",
+                      border: "none", borderRadius: "10px", fontSize: "13px", cursor: "pointer",
                     }}
                   >
                     Cancel
@@ -531,7 +531,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
                   background: notifSaved ? "#22C55E" : "#0F0F0F",
                   color: "white",
                   border: "none",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   fontSize: "13px",
                   fontWeight: 700,
                   cursor: notifSaving ? "wait" : "pointer",
@@ -569,7 +569,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
                 padding: "10px 14px",
                 background: "#F0FDF4",
                 border: "1px solid #BBF7D0",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 fontSize: "13px",
                 color: "#166534",
                 marginBottom: "14px",
@@ -619,7 +619,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
                   background: passwordLoading || !newPassword || !confirmPassword ? "#FFAB8E" : "#FF4F1A",
                   color: "white",
                   border: "none",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   fontSize: "13px",
                   fontWeight: 700,
                   cursor: passwordLoading ? "wait" : (!newPassword || !confirmPassword) ? "not-allowed" : "pointer",
@@ -730,7 +730,7 @@ export default function ProfileClient({ userId, hasPassword, profile, notificati
               background: saved ? "#22C55E" : "#FF4F1A",
               color: "white",
               border: "none",
-              borderRadius: "8px",
+              borderRadius: "10px",
               fontSize: "14px",
               fontWeight: 700,
               cursor: saving ? "wait" : "pointer",

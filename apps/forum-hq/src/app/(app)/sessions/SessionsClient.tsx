@@ -57,7 +57,7 @@ function SessionCard({ session, idx = 0, rsvp }: { session: Session; idx?: numbe
         padding: "16px 20px",
         background: "#FFFFFF",
         border: "1px solid #EBEBEB",
-        borderRadius: "12px",
+        borderRadius: "14px",
         display: "flex",
         alignItems: "flex-start",
         gap: "14px",
@@ -103,7 +103,7 @@ function SessionCard({ session, idx = 0, rsvp }: { session: Session; idx?: numbe
               fontWeight: 600,
               letterSpacing: "0.06em",
               padding: "2px 7px",
-              borderRadius: "20px",
+              borderRadius: "10px",
               background: type.bg,
               color: type.color,
               textTransform: "uppercase",
@@ -171,7 +171,7 @@ function SessionCard({ session, idx = 0, rsvp }: { session: Session; idx?: numbe
             alignItems: "center",
             gap: "5px",
             padding: "8px 14px",
-            borderRadius: "8px",
+            borderRadius: "10px",
             background: "#0F0F0F",
             color: "#FFFFFF",
             fontSize: "12px",
@@ -395,7 +395,7 @@ export default function SessionsClient({ sessions, rsvpData = {} }: { sessions: 
 
         {/* View toggle */}
         {sessions.length > 0 && (
-          <div style={{ display: "flex", background: "#F0F0F0", padding: "3px", borderRadius: "9px" }}>
+          <div style={{ display: "flex", background: "#F0F0F0", padding: "3px", borderRadius: "10px" }}>
             <button onClick={() => setView("list")} style={toggleBtn("list")}>List</button>
             <button onClick={() => setView("calendar")} style={toggleBtn("calendar")}>Calendar</button>
           </div>
@@ -405,11 +405,11 @@ export default function SessionsClient({ sessions, rsvpData = {} }: { sessions: 
       {/* Empty state */}
       {sessions.length === 0 && (
         <div
-          style={{ padding: "48px 28px", textAlign: "center", background: "#FFFFFF", border: "1px solid #EBEBEB", borderRadius: "12px" }}
+          style={{ padding: "48px 28px", textAlign: "center", background: "#FFFFFF", border: "1px solid #EBEBEB", borderRadius: "14px" }}
         >
           <div
             style={{
-              width: "48px", height: "48px", borderRadius: "12px",
+              width: "48px", height: "48px", borderRadius: "14px",
               background: "rgba(255,79,26,0.10)", display: "flex",
               alignItems: "center", justifyContent: "center", margin: "0 auto 16px",
             }}

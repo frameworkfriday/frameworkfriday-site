@@ -83,6 +83,7 @@ export async function createPost(formData: FormData) {
   }
 
   revalidatePath("/announcements");
+  revalidatePath("/dashboard");
 }
 
 export async function editPost(formData: FormData) {
@@ -307,6 +308,7 @@ export async function togglePin(formData: FormData) {
 
   await admin.from("posts").update({ is_pinned: pinned }).eq("id", id);
   revalidatePath("/announcements");
+  revalidatePath("/dashboard");
 }
 
 export async function toggleReaction(formData: FormData) {

@@ -144,7 +144,7 @@ export default async function FacilitatorMemberDetailPage({
               {isFacilitator && (
                 <span style={{
                   display: "inline-flex", alignItems: "center", padding: "2px 10px",
-                  borderRadius: "20px", fontSize: "11px", fontWeight: 600,
+                  borderRadius: "10px", fontSize: "11px", fontWeight: 600,
                   background: "rgba(255,79,26,0.1)", color: "#FF4F1A",
                 }}>
                   Facilitator
@@ -262,7 +262,7 @@ export default async function FacilitatorMemberDetailPage({
                     key={i}
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between",
-                      padding: "10px 12px", background: "#FAFAF9", borderRadius: "8px",
+                      padding: "10px 12px", background: "#FAFAF9", borderRadius: "10px",
                       border: "1px solid #F0F0EE",
                     }}
                   >
@@ -270,7 +270,7 @@ export default async function FacilitatorMemberDetailPage({
                     {g.role === "facilitator" && (
                       <span style={{
                         fontSize: "10px", fontWeight: 600, padding: "1px 8px",
-                        borderRadius: "20px", background: "rgba(255,79,26,0.1)", color: "#FF4F1A",
+                        borderRadius: "10px", background: "rgba(255,79,26,0.1)", color: "#FF4F1A",
                       }}>
                         Facilitator
                       </span>

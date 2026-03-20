@@ -54,7 +54,7 @@ export default function RsvpButtons({ sessionId, currentStatus }: RsvpButtonsPro
               style={{
                 flex: 1,
                 padding: "10px 8px",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 border: `1.5px solid ${isActive ? opt.border : "#E5E5E5"}`,
                 background: isActive ? opt.bg : "#FFFFFF",
                 color: isActive ? opt.color : "#6E6E6E",
@@ -80,7 +80,7 @@ export default function RsvpButtons({ sessionId, currentStatus }: RsvpButtonsPro
             style={{
               width: "100%",
               padding: "10px 12px",
-              borderRadius: "8px",
+              borderRadius: "10px",
               border: "1.5px solid #E5E5E5",
               fontSize: "13px",
               resize: "none",

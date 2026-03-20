@@ -23,7 +23,7 @@ function isPast(iso: string) { return new Date(iso) < new Date(); }
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 14px",
-  borderRadius: "8px",
+  borderRadius: "10px",
   border: "1.5px solid #E5E5E5",
   background: "#FFFFFF",
   fontSize: "14px",
@@ -155,7 +155,7 @@ export default async function AdminSessionsPage() {
               type="submit"
               style={{
                 padding: "10px 24px",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 border: "none",
                 background: "#0F0F0F",
                 color: "#FFFFFF",
@@ -273,7 +273,7 @@ function SessionRow({
             flexShrink: 0,
             textAlign: "center",
             padding: "6px",
-            borderRadius: "8px",
+            borderRadius: "10px",
             background: past ? "#F7F7F6" : type.bg,
             border: `1px solid ${past ? "#E5E5E5" : "transparent"}`,
           }}
@@ -299,7 +299,7 @@ function SessionRow({
                 fontWeight: 600,
                 letterSpacing: "0.06em",
                 padding: "2px 7px",
-                borderRadius: "20px",
+                borderRadius: "10px",
                 background: type.bg,
                 color: type.color,
                 textTransform: "uppercase",

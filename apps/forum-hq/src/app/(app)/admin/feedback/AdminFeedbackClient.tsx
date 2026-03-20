@@ -127,7 +127,7 @@ export default function AdminFeedbackClient({ initialFeedback, profiles }: Props
 
   const pillBase: React.CSSProperties = {
     padding: "6px 14px",
-    borderRadius: "20px",
+    borderRadius: "10px",
     fontSize: "12px",
     fontWeight: 600,
     cursor: "pointer",
@@ -286,7 +286,7 @@ function FeedbackRow({
     padding: "8px 10px",
     fontSize: "13px",
     border: "1px solid #E5E5E5",
-    borderRadius: "8px",
+    borderRadius: "10px",
     outline: "none",
     fontFamily: "inherit",
     color: "#0F0F0F",
@@ -359,7 +359,7 @@ function FeedbackRow({
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
           <span style={{
             display: "inline-flex", alignItems: "center",
-            padding: "3px 8px", borderRadius: "20px",
+            padding: "3px 8px", borderRadius: "10px",
             fontSize: "11px", fontWeight: 600,
             background: typeCfg.bg, color: typeCfg.color,
           }}>
@@ -378,7 +378,7 @@ function FeedbackRow({
 
           <span style={{
             display: "inline-flex", alignItems: "center",
-            padding: "3px 8px", borderRadius: "20px",
+            padding: "3px 8px", borderRadius: "10px",
             fontSize: "11px", fontWeight: 600,
             background: statusCfg.bg, color: statusCfg.color,
           }}>
@@ -463,7 +463,7 @@ function FeedbackRow({
                     background: "rgba(59,130,246,0.08)",
                     color: "#3B82F6",
                     border: "1px solid rgba(59,130,246,0.2)",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     padding: "7px 14px",
                     fontSize: "12px",
                     fontWeight: 600,
@@ -482,7 +482,7 @@ function FeedbackRow({
                     background: "rgba(34,197,94,0.08)",
                     color: "#22C55E",
                     border: "1px solid rgba(34,197,94,0.2)",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     padding: "7px 14px",
                     fontSize: "12px",
                     fontWeight: 600,
@@ -501,7 +501,7 @@ function FeedbackRow({
                     background: "transparent",
                     color: "#A3A3A3",
                     border: "1px solid #E5E5E5",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     padding: "7px 14px",
                     fontSize: "12px",
                     fontWeight: 600,

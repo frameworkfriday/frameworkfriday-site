@@ -14,7 +14,7 @@ interface Profile {
   website_url: string | null;
 }
 
-export default function DirectoryClient({ profiles, currentUserId }: { profiles: Profile[]; currentUserId: string }) {
+export default function DirectoryClient({ profiles, currentUserId, userGroups }: { profiles: Profile[]; currentUserId: string; userGroups: Record<string, { name: string; color: string }> }) {
   const [query, setQuery] = useState("");
 
   const filtered = profiles.filter((p) => {
@@ -22,7 +22,8 @@ export default function DirectoryClient({ profiles, currentUserId }: { profiles:
     if (!q) return true;
     const name = `${p.first_name ?? ""} ${p.last_name ?? ""}`.toLowerCase();
     const biz = (p.business_name ?? "").toLowerCase();
-    return name.includes(q) || biz.includes(q);
+    const groupName = (userGroups[p.id]?.name ?? "").toLowerCase();
+    return name.includes(q) || biz.includes(q) || groupName.includes(q);
   });
 
   return (
@@ -68,7 +69,7 @@ export default function DirectoryClient({ profiles, currentUserId }: { profiles:
               paddingBottom: "8px",
               fontSize: "13px",
               border: "1px solid #E5E5E5",
-              borderRadius: "8px",
+              borderRadius: "10px",
               fontFamily: "inherit",
               color: "#0F0F0F",
               background: "#FFFFFF",
@@ -160,7 +161,7 @@ export default function DirectoryClient({ profiles, currentUserId }: { profiles:
                         {name}
                       </div>
                       {isYou && (
-                        <span style={{ fontSize: "10px", fontWeight: 600, color: "#FF4F1A", background: "rgba(255,79,26,0.10)", padding: "1px 6px", borderRadius: "20px" }}>
+                        <span style={{ fontSize: "10px", fontWeight: 600, color: "#FF4F1A", background: "rgba(255,79,26,0.10)", padding: "1px 6px", borderRadius: "10px" }}>
                           You
                         </span>
                       )}
@@ -178,6 +179,20 @@ export default function DirectoryClient({ profiles, currentUserId }: { profiles:
                     <div style={{ fontSize: "11px", color: "#A3A3A3", marginTop: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {profile.email}
                     </div>
+
+                    {/* Forum group */}
+                    {userGroups[profile.id] && (
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", marginTop: "6px" }}>
+                        <div style={{
+                          width: "6px", height: "6px", borderRadius: "50%",
+                          background: userGroups[profile.id].color,
+                          flexShrink: 0,
+                        }} />
+                        <span style={{ fontSize: "11px", fontWeight: 600, color: "#6E6E6E" }}>
+                          {userGroups[profile.id].name}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Social links */}
                     {(profile.linkedin_url || profile.website_url) && (

@@ -100,7 +100,7 @@ export default async function FacilitatorPage({
                 href={`/facilitator?group=${g.slug}`}
                 style={{
                   padding: "6px 14px",
-                  borderRadius: "20px",
+                  borderRadius: "10px",
                   fontSize: "12px",
                   fontFamily: "var(--font-syne)",
                   fontWeight: 600,

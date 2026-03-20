@@ -143,7 +143,7 @@ export default function NotificationBell({
           left: "0",
           width: "320px",
           background: "#FFFFFF",
-          borderRadius: "12px",
+          borderRadius: "14px",
           boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
           zIndex: 100,
           overflow: "hidden",

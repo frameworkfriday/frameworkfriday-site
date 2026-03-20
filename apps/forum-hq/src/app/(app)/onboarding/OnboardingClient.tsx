@@ -153,7 +153,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
     padding: "10px 12px",
     fontSize: "14px",
     border: "1px solid #E5E5E5",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontFamily: "inherit",
     color: "#0F0F0F",
     background: "#FFFFFF",
@@ -264,7 +264,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                     gap: "6px",
                     padding: "4px 10px",
                     background: "rgba(255,79,26,0.10)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                     fontSize: "12px",
                     fontWeight: 600,
                     color: "#FF4F1A",
@@ -354,7 +354,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                   background: "#FF4F1A",
                   color: "white",
                   border: "none",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   fontSize: "15px",
                   fontWeight: 700,
                   cursor: "pointer",
@@ -417,7 +417,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
                   onClick={() => setStep(0)}
-                  style={{ padding: "12px 20px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}
+                  style={{ padding: "12px 20px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}
                 >
                   Back
                 </button>
@@ -430,7 +430,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                     background: firstName && lastName ? "#FF4F1A" : "#E5E5E5",
                     color: firstName && lastName ? "white" : "#A3A3A3",
                     border: "none",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     fontSize: "15px",
                     fontWeight: 700,
                     cursor: firstName && lastName ? "pointer" : "default",
@@ -488,7 +488,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                       disabled={uploading || !completedCrop}
                       style={{
                         flex: 1, padding: "10px", background: "#FF4F1A", color: "white",
-                        border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600,
+                        border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 600,
                         cursor: uploading ? "wait" : "pointer",
                       }}
                     >
@@ -496,7 +496,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                     </button>
                     <button
                       onClick={() => { setImgSrc(""); setCrop(undefined); }}
-                      style={{ padding: "10px 16px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "8px", fontSize: "14px", cursor: "pointer" }}
+                      style={{ padding: "10px 16px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "10px", fontSize: "14px", cursor: "pointer" }}
                     >
                       Cancel
                     </button>
@@ -505,7 +505,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
               ) : (
                 <div
                   style={{
-                    border: "2px dashed #E5E5E5", borderRadius: "12px", padding: "32px",
+                    border: "2px dashed #E5E5E5", borderRadius: "14px", padding: "32px",
                     textAlign: "center", marginBottom: "16px", cursor: "pointer",
                   }}
                   onClick={() => document.getElementById("photo-input")?.click()}
@@ -520,7 +520,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
                   onClick={() => setStep(1)}
-                  style={{ padding: "12px 20px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}
+                  style={{ padding: "12px 20px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}
                 >
                   Back
                 </button>
@@ -529,7 +529,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                   style={{
                     flex: 1, padding: "12px",
                     background: avatarUrl ? "#FF4F1A" : "#0F0F0F",
-                    color: "white", border: "none", borderRadius: "8px",
+                    color: "white", border: "none", borderRadius: "10px",
                     fontSize: "15px", fontWeight: 700, cursor: "pointer", letterSpacing: "-0.01em",
                   }}
                 >
@@ -586,7 +586,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
 
               <div
                 style={{
-                  padding: "12px 16px", background: "#F7F7F6", borderRadius: "8px",
+                  padding: "12px 16px", background: "#F7F7F6", borderRadius: "10px",
                   fontSize: "13px", color: "#6E6E6E", lineHeight: 1.5, marginBottom: "24px",
                 }}
               >
@@ -600,7 +600,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
                   onClick={() => setStep(2)}
-                  style={{ padding: "12px 20px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}
+                  style={{ padding: "12px 20px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}
                 >
                   Back
                 </button>
@@ -608,7 +608,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                   onClick={() => setStep(4)}
                   style={{
                     flex: 1, padding: "12px", background: "#FF4F1A", color: "white",
-                    border: "none", borderRadius: "8px", fontSize: "15px", fontWeight: 700,
+                    border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700,
                     cursor: "pointer", letterSpacing: "-0.01em",
                   }}
                 >
@@ -699,7 +699,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
                   onClick={() => setStep(3)}
-                  style={{ padding: "12px 20px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}
+                  style={{ padding: "12px 20px", background: "#F0F0F0", color: "#0F0F0F", border: "none", borderRadius: "10px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}
                 >
                   Back
                 </button>
@@ -708,7 +708,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                   disabled={saving}
                   style={{
                     flex: 1, padding: "12px", background: "#FF4F1A", color: "white",
-                    border: "none", borderRadius: "8px", fontSize: "15px", fontWeight: 700,
+                    border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700,
                     cursor: saving ? "wait" : "pointer", letterSpacing: "-0.01em",
                   }}
                 >
@@ -740,7 +740,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                   gap: "14px",
                   padding: "16px",
                   background: "#F7F7F6",
-                  borderRadius: "12px",
+                  borderRadius: "14px",
                   marginBottom: "16px",
                   border: "1px solid #EEEEED",
                 }}
@@ -776,7 +776,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                         marginTop: "5px",
                         display: "inline-flex", alignItems: "center", gap: "4px",
                         fontSize: "11px", fontWeight: 600, color: "#FF4F1A",
-                        background: "rgba(255,79,26,0.10)", padding: "2px 8px", borderRadius: "20px",
+                        background: "rgba(255,79,26,0.10)", padding: "2px 8px", borderRadius: "10px",
                       }}
                     >
                       {groupName}
@@ -806,7 +806,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                     </span>
                     <span
                       style={{
-                        fontSize: "11px", fontWeight: 600, padding: "1px 7px", borderRadius: "20px",
+                        fontSize: "11px", fontWeight: 600, padding: "1px 7px", borderRadius: "10px",
                         background: nextSession.session_type === "office_hours" ? "#F0F0F0" : "rgba(255,79,26,0.10)",
                         color: nextSession.session_type === "office_hours" ? "#6E6E6E" : "#FF4F1A",
                       }}
@@ -856,7 +856,7 @@ export default function OnboardingClient({ userId, email, initialProfile, groupN
                 onClick={() => router.push("/")}
                 style={{
                   width: "100%", padding: "13px", background: "#FF4F1A", color: "white",
-                  border: "none", borderRadius: "8px", fontSize: "15px", fontWeight: 700,
+                  border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700,
                   cursor: "pointer", letterSpacing: "-0.01em",
                 }}
               >

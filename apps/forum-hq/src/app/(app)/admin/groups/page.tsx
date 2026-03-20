@@ -147,7 +147,7 @@ export default async function AdminGroupsPage() {
                           color: "#FF4F1A",
                           background: "rgba(255,79,26,0.10)",
                           padding: "3px 10px",
-                          borderRadius: "20px",
+                          borderRadius: "10px",
                           whiteSpace: "nowrap",
                         }}
                       >
@@ -240,7 +240,7 @@ export default async function AdminGroupsPage() {
 
                   {/* Member list */}
                   {members.length > 0 ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1px", background: "#F7F7F6", borderRadius: "8px", overflow: "hidden" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1px", background: "#F7F7F6", borderRadius: "10px", overflow: "hidden" }}>
                       {members.map((member) => {
                         const fullName = [member!.first_name, member!.last_name].filter(Boolean).join(" ") || member!.email;
                         const initial = (member!.first_name || member!.email || "?")[0].toUpperCase();
@@ -290,7 +290,7 @@ export default async function AdminGroupsPage() {
                                   fontSize: "10px",
                                   fontWeight: 600,
                                   padding: "3px 10px",
-                                  borderRadius: "20px",
+                                  borderRadius: "10px",
                                   border: isFac ? "1px solid #FF4F1A" : "1px dashed #D5D5D5",
                                   background: isFac ? "rgba(255,79,26,0.10)" : "transparent",
                                   color: isFac ? "#FF4F1A" : "#A3A3A3",
@@ -312,7 +312,7 @@ export default async function AdminGroupsPage() {
                                 style={{
                                   background: "none",
                                   border: "1px solid #E5E5E5",
-                                  borderRadius: "4px",
+                                  borderRadius: "14px",
                                   padding: "3px 8px",
                                   fontSize: "12px",
                                   color: "#A3A3A3",

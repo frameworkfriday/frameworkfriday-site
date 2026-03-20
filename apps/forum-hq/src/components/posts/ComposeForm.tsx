@@ -75,7 +75,7 @@ export default function ComposeForm({ role, groups, createAction }: Props) {
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "10px 14px",
-    borderRadius: "8px",
+    borderRadius: "10px",
     border: "1.5px solid #E5E5E5",
     background: "#FFFFFF",
     fontSize: "14px",
@@ -165,7 +165,7 @@ export default function ComposeForm({ role, groups, createAction }: Props) {
         {/* Multi-group selector for admin */}
         {audience === "groups" && canMultiGroup && groups.length > 1 && (
           <div style={{
-            border: "1.5px solid #E5E5E5", borderRadius: "8px", marginBottom: "14px",
+            border: "1.5px solid #E5E5E5", borderRadius: "10px", marginBottom: "14px",
             maxHeight: "160px", overflowY: "auto",
           }}>
             {groups.map((g) => {
@@ -182,7 +182,7 @@ export default function ComposeForm({ role, groups, createAction }: Props) {
                   }}
                 >
                   <div style={{
-                    width: "16px", height: "16px", borderRadius: "4px",
+                    width: "16px", height: "16px", borderRadius: "14px",
                     border: `2px solid ${checked ? "#FF4F1A" : "#D4D4D4"}`,
                     background: checked ? "#FF4F1A" : "transparent",
                     display: "flex", alignItems: "center", justifyContent: "center",
@@ -256,7 +256,7 @@ export default function ComposeForm({ role, groups, createAction }: Props) {
             disabled={!body.trim() || isPending}
             style={{
               padding: "10px 24px",
-              borderRadius: "8px",
+              borderRadius: "10px",
               border: "none",
               background: body.trim() ? "#FF4F1A" : "#E5E5E5",
               color: body.trim() ? "#FFFFFF" : "#A3A3A3",
@@ -271,7 +271,7 @@ export default function ComposeForm({ role, groups, createAction }: Props) {
             type="button"
             onClick={() => { setOpen(false); setBody(""); setTitle(""); }}
             style={{
-              padding: "10px 16px", borderRadius: "8px",
+              padding: "10px 16px", borderRadius: "10px",
               border: "1px solid #E5E5E5", background: "none",
               fontSize: "13px", fontWeight: 600, color: "#6E6E6E",
               cursor: "pointer",

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
-import { toggleReaction, createComment } from "@/app/(app)/announcements/actions";
+import { toggleReaction, createComment, togglePin, createPost } from "@/app/(app)/announcements/actions";
 
 interface CommentData {
   id: string;
@@ -35,40 +35,340 @@ interface PostData {
   reactions: ReactionGroup[];
 }
 
+interface GroupData {
+  id: string;
+  name: string;
+}
+
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "now";
-  if (mins < 60) return `${mins}m`;
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h`;
+  if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d`;
+  if (days < 7) return `${days}d ago`;
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-const TYPE_DOT: Record<string, string> = {
-  announcement: "#FF4F1A",
-  discussion: "#3B82F6",
-  question: "#8B5CF6",
+const TYPE_BADGE: Record<string, { label: string; color: string; bg: string }> = {
+  announcement: { label: "Announcement", color: "#FF4F1A", bg: "rgba(255,79,26,0.08)" },
+  discussion: { label: "Discussion", color: "#3B82F6", bg: "rgba(59,130,246,0.06)" },
+  question: { label: "Question", color: "#8B5CF6", bg: "rgba(139,92,246,0.06)" },
 };
 
-const QUICK_EMOJIS = ["👍", "🔥", "💡", "❤️", "👏"];
+const QUICK_EMOJIS = ["❤️", "👍", "🔥", "💡", "👏"];
 
-function FeedItem({ post, currentUserId }: { post: PostData; currentUserId: string }) {
+/* ── Avatar ── */
+function Avatar({ name, url, size = 36 }: { name: string; url: string | null; size?: number }) {
+  const initials = name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+  if (url) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={url} alt={name}
+        style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+    );
+  }
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: "50%",
+      background: "rgba(255,79,26,0.08)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: size * 0.32, fontWeight: 700, color: "#FF4F1A", flexShrink: 0,
+    }}>
+      {initials}
+    </div>
+  );
+}
+
+/* ── Post Menu (admin controls) ── */
+function PostMenu({ post, isAdmin }: { post: PostData; isAdmin: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    if (open) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const handlePin = () => {
+    const fd = new FormData();
+    fd.set("id", post.id);
+    fd.set("pinned", post.is_pinned ? "false" : "true");
+    startTransition(() => togglePin(fd));
+    setOpen(false);
+  };
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center",
+          width: "28px", height: "28px", borderRadius: "10px",
+          border: "none", background: open ? "#F5F5F4" : "transparent",
+          cursor: "pointer", color: "#A3A3A3", fontSize: "16px",
+          transition: "background 0.15s ease",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "#F5F5F4")}
+        onMouseLeave={(e) => { if (!open) e.currentTarget.style.background = "transparent"; }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="2" />
+          <circle cx="12" cy="12" r="2" />
+          <circle cx="12" cy="19" r="2" />
+        </svg>
+      </button>
+      {open && (
+        <div style={{
+          position: "absolute", top: "32px", right: 0, zIndex: 20,
+          background: "#FFFFFF", borderRadius: "14px",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.05)",
+          minWidth: "160px", overflow: "hidden",
+        }}>
+          {isAdmin && (
+            <button
+              onClick={handlePin}
+              disabled={isPending}
+              style={{
+                display: "flex", alignItems: "center", gap: "8px",
+                width: "100%", padding: "10px 14px",
+                border: "none", background: "none", cursor: "pointer",
+                fontSize: "13px", fontWeight: 500, color: "#0F0F0F",
+                textAlign: "left",
+                transition: "background 0.1s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#F5F5F4")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={post.is_pinned ? "#FF4F1A" : "#6E6E6E"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 17v5" /><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76z" />
+              </svg>
+              {post.is_pinned ? "Unpin post" : "Pin to top"}
+            </button>
+          )}
+          <Link
+            href={`/announcements/${post.id}`}
+            onClick={() => setOpen(false)}
+            style={{
+              display: "flex", alignItems: "center", gap: "8px",
+              width: "100%", padding: "10px 14px",
+              textDecoration: "none",
+              fontSize: "13px", fontWeight: 500, color: "#0F0F0F",
+              transition: "background 0.1s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#F5F5F4")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6E6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+            Open full post
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Inline Compose ── */
+function InlineCompose({
+  role,
+  groups,
+}: {
+  role: "admin" | "facilitator" | "member";
+  groups: GroupData[];
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [body, setBody] = useState("");
+  const [title, setTitle] = useState("");
+  const [postType, setPostType] = useState("discussion");
+  const [isPending, startTransition] = useTransition();
+
+  const canAnnounce = role === "admin" || role === "facilitator";
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!body.trim()) return;
+    const fd = new FormData();
+    fd.set("body", body.trim());
+    if (title.trim()) fd.set("title", title.trim());
+    fd.set("post_type", postType);
+    fd.set("is_global", "true");
+    startTransition(async () => {
+      await createPost(fd);
+      setBody("");
+      setTitle("");
+      setPostType("discussion");
+      setExpanded(false);
+    });
+  };
+
+  if (!expanded) {
+    return (
+      <div
+        onClick={() => setExpanded(true)}
+        style={{
+          background: "#FFFFFF", border: "none", boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)", borderRadius: "14px",
+          padding: "14px 20px", cursor: "pointer",
+          display: "flex", alignItems: "center", gap: "12px",
+          transition: "border-color 0.15s ease",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#D0D0D0")}
+        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#E5E5E4")}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+          <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        <span style={{ fontSize: "14px", color: "#A3A3A3" }}>
+          {canAnnounce ? "Post an announcement or start a discussion..." : "Start a discussion or ask a question..."}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      background: "#FFFFFF", border: "none", boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)", borderRadius: "14px",
+      overflow: "hidden",
+    }}>
+      <form onSubmit={handleSubmit}>
+        {/* Body */}
+        <div style={{ padding: "16px 20px 0" }}>
+          {(postType === "announcement" || title) && (
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Title"
+              style={{
+                width: "100%", padding: "0", marginBottom: "8px",
+                border: "none", outline: "none", fontFamily: "inherit",
+                fontSize: "16px", fontWeight: 700, color: "#0F0F0F",
+                background: "transparent",
+              }}
+            />
+          )}
+          <textarea
+            autoFocus
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder={
+              postType === "announcement" ? "Write your announcement..."
+                : postType === "question" ? "What's your question?"
+                : "What's on your mind?"
+            }
+            rows={4}
+            style={{
+              width: "100%", padding: "0", resize: "vertical",
+              border: "none", outline: "none", fontFamily: "inherit",
+              fontSize: "14px", color: "#0F0F0F", lineHeight: 1.6,
+              background: "transparent", minHeight: "80px",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {/* Bottom toolbar */}
+        <div style={{
+          padding: "10px 20px", borderTop: "1px solid #F0F0EE",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          {/* Post type tabs */}
+          <div style={{ display: "flex", gap: "0" }}>
+            {(canAnnounce
+              ? [
+                  { value: "announcement", label: "Announcement" },
+                  { value: "discussion", label: "Discussion" },
+                  { value: "question", label: "Question" },
+                ]
+              : [
+                  { value: "discussion", label: "Discussion" },
+                  { value: "question", label: "Question" },
+                ]
+            ).map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => setPostType(t.value)}
+                style={{
+                  display: "inline-flex", alignItems: "center",
+                  padding: "5px 12px", border: "none", cursor: "pointer",
+                  fontSize: "12px", fontWeight: 600, borderRadius: "8px",
+                  background: postType === t.value ? "#0F0F0F" : "transparent",
+                  color: postType === t.value ? "#FFFFFF" : "#6E6E6E",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <button
+              type="button"
+              onClick={() => { setExpanded(false); setBody(""); setTitle(""); }}
+              style={{
+                padding: "6px 14px", borderRadius: "10px",
+                border: "none", background: "none",
+                fontSize: "12px", fontWeight: 600, color: "#6E6E6E", cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={!body.trim() || isPending}
+              style={{
+                padding: "6px 18px", borderRadius: "10px", border: "none",
+                background: body.trim() ? "#FF4F1A" : "#E5E5E4",
+                color: body.trim() ? "#FFF" : "#A3A3A3",
+                fontSize: "12px", fontWeight: 700, cursor: body.trim() ? "pointer" : "default",
+                transition: "all 0.15s ease",
+              }}
+            >
+              {isPending ? "Posting..." : "Post"}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ── Feed Card ── */
+function FeedCard({
+  post,
+  currentUserId,
+  isAdmin,
+}: {
+  post: PostData;
+  currentUserId: string;
+  isAdmin: boolean;
+}) {
   const [expanded, setExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [isPending, startTransition] = useTransition();
   const [localReactions, setLocalReactions] = useState(post.reactions);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [commentSort, setCommentSort] = useState<"newest" | "oldest">("newest");
 
   const authorName = post.author
     ? `${post.author.first_name} ${post.author.last_name}`.trim()
     : "Forum Team";
-  const initials = authorName.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+
+  const totalReactions = localReactions.reduce((sum, r) => sum + r.count, 0);
+  const heartReaction = localReactions.find((r) => r.emoji === "❤️");
+  const typeBadge = TYPE_BADGE[post.post_type] || TYPE_BADGE.discussion;
 
   const handleReaction = (emoji: string) => {
-    // Optimistic update
     setLocalReactions((prev) => {
       const existing = prev.find((r) => r.emoji === emoji);
       if (existing) {
@@ -82,7 +382,6 @@ function FeedItem({ post, currentUserId }: { post: PostData; currentUserId: stri
       return [...prev, { emoji, count: 1, reacted: true }];
     });
     setShowEmojiPicker(false);
-
     const fd = new FormData();
     fd.set("post_id", post.id);
     fd.set("emoji", emoji);
@@ -101,212 +400,324 @@ function FeedItem({ post, currentUserId }: { post: PostData; currentUserId: stri
     });
   };
 
-  return (
-    <div style={{ padding: "14px 0", borderBottom: "1px solid #F0F0EE" }}>
-      {/* Author row */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-        {post.author?.avatar_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={post.author.avatar_url} alt={authorName}
-            style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
-        ) : (
-          <div style={{
-            width: "28px", height: "28px", borderRadius: "50%",
-            background: "rgba(255,79,26,0.1)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "10px", fontWeight: 700, color: "#FF4F1A", flexShrink: 0,
-          }}>
-            {initials}
-          </div>
-        )}
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "#0F0F0F" }}>{authorName}</span>
-        <span style={{
-          width: "5px", height: "5px", borderRadius: "50%",
-          background: TYPE_DOT[post.post_type] || "#3B82F6", flexShrink: 0,
-        }} />
-        <span style={{ fontSize: "11px", color: "#A3A3A3" }}>
-          {timeAgo(post.created_at)}
-          {post.edited_at && " · edited"}
-        </span>
-        {post.is_pinned && (
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="#FF4F1A" stroke="none" style={{ marginLeft: "auto", flexShrink: 0 }}>
-            <path d="M16 2L17.5 3.5L14.5 6.5L16 12L18.5 14.5H13L12 22L11 14.5H5.5L8 12L9.5 6.5L6.5 3.5L8 2H16Z" />
-          </svg>
-        )}
-      </div>
+  const sortedComments = [...post.comments].sort((a, b) => {
+    if (commentSort === "newest") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+  });
 
-      {/* Content */}
-      <div style={{ paddingLeft: "36px" }}>
+  return (
+    <div style={{
+      background: "#FFFFFF",
+      border: "none", boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)",
+      borderRadius: "14px",
+      overflow: "hidden",
+    }}>
+      {/* Pinned accent bar */}
+      {post.is_pinned && <div style={{ height: "3px", background: "#FF4F1A" }} />}
+
+      <div style={{ padding: "20px 24px" }}>
+        {/* Author row */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", marginBottom: "12px" }}>
+          <Avatar name={authorName} url={post.author?.avatar_url ?? null} size={40} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "#0F0F0F" }}>{authorName}</span>
+              {post.is_pinned && (
+                <span style={{
+                  fontSize: "9px", fontWeight: 700, padding: "1px 6px", borderRadius: "10px",
+                  background: "rgba(255,79,26,0.08)", color: "#FF4F1A",
+                  textTransform: "uppercase", letterSpacing: "0.04em",
+                }}>
+                  Pinned
+                </span>
+              )}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "1px" }}>
+              <span style={{ fontSize: "12px", color: "#A3A3A3" }}>
+                {timeAgo(post.created_at)}
+                {post.edited_at && " · Edited"}
+              </span>
+              <span style={{ color: "#D0D0D0" }}>·</span>
+              <span style={{
+                fontSize: "10px", fontWeight: 600, padding: "1px 6px", borderRadius: "10px",
+                background: typeBadge.bg, color: typeBadge.color,
+                textTransform: "uppercase", letterSpacing: "0.03em",
+              }}>
+                {typeBadge.label}
+              </span>
+            </div>
+          </div>
+          {/* Admin menu */}
+          <PostMenu post={post} isAdmin={isAdmin} />
+        </div>
+
+        {/* Title */}
         {post.title && (
           <Link href={`/announcements/${post.id}`} style={{ textDecoration: "none" }}>
-            <div style={{ fontWeight: 600, fontSize: "14px", color: "#0F0F0F", marginBottom: "2px" }}>
+            <h3 style={{
+              fontWeight: 700, fontSize: "17px", color: "#0F0F0F",
+              margin: "0 0 6px", lineHeight: 1.35, letterSpacing: "-0.01em",
+            }}>
               {post.title}
-            </div>
+            </h3>
           </Link>
         )}
+
+        {/* Body */}
         <div style={{
-          fontSize: "13px", color: "#3D3D3D", lineHeight: 1.55,
-          display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical",
+          fontSize: "14px", color: "#4A4A4A", lineHeight: 1.65,
+          display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical",
           overflow: "hidden",
         }}>
           {post.body}
         </div>
 
-        {/* Reactions row */}
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "8px", flexWrap: "wrap" }}>
-          {localReactions.map((r) => (
-            <button
-              key={r.emoji}
-              onClick={() => handleReaction(r.emoji)}
-              style={{
-                display: "inline-flex", alignItems: "center", gap: "4px",
-                padding: "2px 8px", borderRadius: "12px",
-                border: r.reacted ? "1px solid rgba(255,79,26,0.3)" : "1px solid #E5E5E5",
-                background: r.reacted ? "rgba(255,79,26,0.06)" : "transparent",
-                fontSize: "12px", cursor: "pointer", lineHeight: 1.4,
-              }}
-            >
-              <span>{r.emoji}</span>
-              <span style={{ fontWeight: 600, color: r.reacted ? "#FF4F1A" : "#6E6E6E", fontSize: "11px" }}>{r.count}</span>
-            </button>
-          ))}
-
-          {/* Add reaction button */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              style={{
-                display: "inline-flex", alignItems: "center", justifyContent: "center",
-                width: "26px", height: "26px", borderRadius: "12px",
-                border: "1px solid #E5E5E5", background: "transparent",
-                cursor: "pointer", fontSize: "12px", color: "#A3A3A3",
-              }}
-            >
-              +
-            </button>
-            {showEmojiPicker && (
-              <div style={{
-                position: "absolute", bottom: "32px", left: 0, zIndex: 10,
-                display: "flex", gap: "4px", padding: "6px 8px",
-                background: "#FFFFFF", border: "1px solid #E5E5E5",
-                borderRadius: "10px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        {/* Group tags */}
+        {post.groups.length > 0 && !post.is_global && (
+          <div style={{ display: "flex", gap: "6px", marginTop: "10px", flexWrap: "wrap" }}>
+            {post.groups.map((g, i) => (
+              <span key={i} style={{
+                fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "10px",
+                background: "#F5F5F4", color: "#6E6E6E",
               }}>
-                {QUICK_EMOJIS.map((e) => (
+                {g.name}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Engagement bar ── */}
+      <div style={{
+        borderTop: "1px solid #F0F0EE",
+        padding: "0 24px",
+        display: "flex", alignItems: "center",
+        height: "46px",
+        gap: "4px",
+      }}>
+        {/* Heart / like button */}
+        <button
+          onClick={() => handleReaction("❤️")}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "5px",
+            padding: "6px 12px", borderRadius: "10px",
+            border: heartReaction?.reacted ? "1px solid rgba(255,79,26,0.25)" : "1px solid #E5E5E4",
+            background: heartReaction?.reacted ? "rgba(255,79,26,0.04)" : "transparent",
+            cursor: "pointer", transition: "all 0.15s ease",
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24"
+            fill={heartReaction?.reacted ? "#FF4F1A" : "none"}
+            stroke={heartReaction?.reacted ? "#FF4F1A" : "#6E6E6E"}
+            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+          <span style={{ fontWeight: 600, color: heartReaction?.reacted ? "#FF4F1A" : "#6E6E6E", fontSize: "12px" }}>
+            {totalReactions > 0 ? totalReactions : "Like"}
+          </span>
+        </button>
+
+        {/* Comment button */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "5px",
+            padding: "6px 12px", borderRadius: "10px",
+            border: expanded ? "1px solid rgba(255,79,26,0.25)" : "1px solid #E5E5E4",
+            background: expanded ? "rgba(255,79,26,0.04)" : "transparent",
+            cursor: "pointer", transition: "all 0.15s ease",
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke={expanded ? "#FF4F1A" : "#6E6E6E"}
+            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span style={{ fontWeight: 600, color: expanded ? "#FF4F1A" : "#6E6E6E", fontSize: "12px" }}>
+            {post.comment_count > 0 ? `${post.comment_count} ${post.comment_count === 1 ? "reply" : "replies"}` : "Reply"}
+          </span>
+        </button>
+
+        {/* Emoji quick add */}
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              padding: "6px 10px", borderRadius: "10px",
+              border: "none", background: "transparent",
+              cursor: "pointer", fontSize: "13px", color: "#A3A3A3",
+              transition: "all 0.15s ease",
+            }}
+          >
+            😊+
+          </button>
+          {showEmojiPicker && (
+            <div style={{
+              position: "absolute", bottom: "38px", left: 0, zIndex: 10,
+              display: "flex", gap: "2px", padding: "6px 8px",
+              background: "#FFFFFF", borderRadius: "14px",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.05)",
+            }}>
+              {QUICK_EMOJIS.map((e) => (
+                <button
+                  key={e}
+                  onClick={() => handleReaction(e)}
+                  style={{
+                    padding: "5px 7px", background: "none", border: "none",
+                    cursor: "pointer", fontSize: "16px", borderRadius: "10px",
+                  }}
+                  onMouseEnter={(ev) => (ev.currentTarget.style.background = "#F5F5F4")}
+                  onMouseLeave={(ev) => (ev.currentTarget.style.background = "none")}
+                >
+                  {e}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Other reaction pills */}
+        {localReactions.filter(r => r.emoji !== "❤️").length > 0 && (
+          <div style={{ display: "flex", gap: "4px", marginLeft: "2px" }}>
+            {localReactions.filter(r => r.emoji !== "❤️").map((r) => (
+              <button
+                key={r.emoji}
+                onClick={() => handleReaction(r.emoji)}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "3px",
+                  padding: "4px 8px", borderRadius: "10px",
+                  border: r.reacted ? "1px solid rgba(255,79,26,0.25)" : "1px solid #E5E5E4",
+                  background: r.reacted ? "rgba(255,79,26,0.04)" : "transparent",
+                  cursor: "pointer", fontSize: "12px",
+                }}
+              >
+                <span>{r.emoji}</span>
+                <span style={{ fontWeight: 600, color: r.reacted ? "#FF4F1A" : "#6E6E6E", fontSize: "11px" }}>{r.count}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Comments section ── */}
+      {expanded && (
+        <div style={{ borderTop: "1px solid #F0F0EE" }}>
+          {/* Comment header */}
+          {post.comment_count > 0 && (
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "12px 24px", borderBottom: "1px solid #F5F5F4",
+            }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "#0F0F0F" }}>
+                {post.comment_count} Comment{post.comment_count !== 1 ? "s" : ""}
+              </span>
+              <div style={{ display: "flex", gap: "12px" }}>
+                {(["newest", "oldest"] as const).map((s) => (
                   <button
-                    key={e}
-                    onClick={() => handleReaction(e)}
+                    key={s}
+                    onClick={() => setCommentSort(s)}
                     style={{
-                      padding: "4px 6px", background: "none", border: "none",
-                      cursor: "pointer", fontSize: "16px", borderRadius: "6px",
+                      background: "none", border: "none", cursor: "pointer",
+                      fontSize: "12px", fontWeight: 600, padding: 0,
+                      color: commentSort === s ? "#0F0F0F" : "#A3A3A3",
+                      borderBottom: commentSort === s ? "2px solid #0F0F0F" : "2px solid transparent",
+                      paddingBottom: "2px",
                     }}
-                    onMouseEnter={(ev) => (ev.currentTarget.style.background = "#F0F0F0")}
-                    onMouseLeave={(ev) => (ev.currentTarget.style.background = "none")}
                   >
-                    {e}
+                    {s === "newest" ? "Newest first" : "Oldest first"}
                   </button>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Comment toggle */}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "4px",
-              marginLeft: "auto", background: "none", border: "none",
-              cursor: "pointer", fontSize: "12px", color: "#A3A3A3", padding: 0,
-            }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            {post.comment_count > 0 ? (
-              <span style={{ fontWeight: 600, color: expanded ? "#FF4F1A" : "#6E6E6E" }}>
-                {post.comment_count}
-              </span>
-            ) : (
-              <span>Reply</span>
-            )}
-          </button>
-        </div>
-
-        {/* Inline thread */}
-        {expanded && (
-          <div style={{ marginTop: "10px", borderTop: "1px solid #F5F5F4", paddingTop: "8px" }}>
-            {post.comments.map((c) => {
+          {/* Comments list */}
+          <div style={{ padding: "0 24px" }}>
+            {sortedComments.map((c, idx) => {
               const cName = c.author ? `${c.author.first_name} ${c.author.last_name}`.trim() : "Member";
-              const cInitials = cName.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
               return (
-                <div key={c.id} style={{ display: "flex", gap: "8px", padding: "6px 0" }}>
-                  {c.author?.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.author.avatar_url} alt={cName}
-                      style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, marginTop: "1px" }} />
-                  ) : (
-                    <div style={{
-                      width: "22px", height: "22px", borderRadius: "50%",
-                      background: "rgba(255,79,26,0.08)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: "8px", fontWeight: 700, color: "#FF4F1A", flexShrink: 0, marginTop: "1px",
-                    }}>
-                      {cInitials}
-                    </div>
-                  )}
+                <div key={c.id} style={{
+                  display: "flex", gap: "10px", padding: "14px 0",
+                  borderBottom: idx < sortedComments.length - 1 ? "1px solid #F5F5F4" : "none",
+                }}>
+                  <Avatar name={cName} url={c.author?.avatar_url ?? null} size={32} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ fontSize: "12px", fontWeight: 600, color: "#0F0F0F" }}>{cName}</span>
-                    <span style={{ fontSize: "11px", color: "#A3A3A3", marginLeft: "6px" }}>{timeAgo(c.created_at)}</span>
-                    <div style={{ fontSize: "13px", color: "#3D3D3D", lineHeight: 1.5, marginTop: "1px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#0F0F0F" }}>{cName}</span>
+                      <span style={{ fontSize: "11px", color: "#A3A3A3" }}>{timeAgo(c.created_at)}</span>
+                    </div>
+                    <div style={{ fontSize: "13px", color: "#4A4A4A", lineHeight: 1.6 }}>
                       {c.body}
                     </div>
                   </div>
                 </div>
               );
             })}
+          </div>
 
-            {/* Reply input */}
-            <form onSubmit={handleComment} style={{ display: "flex", gap: "8px", marginTop: "6px" }}>
+          {/* Reply input */}
+          <div style={{ padding: "12px 24px 16px", borderTop: "1px solid #F5F5F4" }}>
+            <form onSubmit={handleComment} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
               <input
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Reply..."
+                placeholder="Write a comment..."
                 style={{
-                  flex: 1, padding: "7px 10px", fontSize: "13px",
-                  border: "1px solid #E5E5E5", borderRadius: "8px",
+                  flex: 1, padding: "9px 14px", fontSize: "13px",
+                  border: "1px solid #EAEAE8", borderRadius: "10px",
                   outline: "none", fontFamily: "inherit", color: "#0F0F0F",
+                  background: "#FAFAF9",
+                  transition: "border-color 0.15s ease",
                 }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "#D0D0D0")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "#E5E5E4")}
               />
               <button
                 type="submit"
                 disabled={!newComment.trim() || isPending}
                 style={{
-                  padding: "7px 14px", borderRadius: "8px", border: "none",
-                  background: newComment.trim() ? "#FF4F1A" : "#E5E5E5",
+                  padding: "9px 18px", borderRadius: "10px", border: "none",
+                  background: newComment.trim() ? "#FF4F1A" : "#E5E5E4",
                   color: newComment.trim() ? "#FFF" : "#A3A3A3",
-                  fontSize: "12px", fontWeight: 600, cursor: newComment.trim() ? "pointer" : "default",
-                  flexShrink: 0,
+                  fontSize: "12px", fontWeight: 700, cursor: newComment.trim() ? "pointer" : "default",
+                  flexShrink: 0, transition: "all 0.15s ease",
                 }}
               >
-                {isPending ? "..." : "Send"}
+                {isPending ? "..." : "Reply"}
               </button>
             </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
 
+/* ── Main Feed Component ── */
 export default function DashboardFeed({
   posts,
   currentUserId,
+  userRole,
+  groups,
 }: {
   posts: PostData[];
   currentUserId: string;
+  userRole: "admin" | "facilitator" | "member";
+  groups: GroupData[];
 }) {
   const [sort, setSort] = useState<"recent" | "active">("recent");
+  const [typeFilter, setTypeFilter] = useState<"all" | "announcement" | "discussion" | "question">("all");
 
-  const sorted = [...posts].sort((a, b) => {
+  const isAdmin = userRole === "admin";
+
+  // Filter by type
+  const filtered = typeFilter === "all" ? posts : posts.filter((p) => p.post_type === typeFilter);
+
+  // Sort
+  const sorted = [...filtered].sort((a, b) => {
     if (sort === "active") {
       const scoreA = a.comment_count + a.reactions.reduce((sum, r) => sum + r.count, 0);
       const scoreB = b.comment_count + b.reactions.reduce((sum, r) => sum + r.count, 0);
@@ -315,65 +726,96 @@ export default function DashboardFeed({
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
-  // Pinned always first
   const pinned = sorted.filter((p) => p.is_pinned);
   const unpinned = sorted.filter((p) => !p.is_pinned);
   const ordered = [...pinned, ...unpinned];
 
-  if (posts.length === 0) {
-    return (
-      <div style={{ padding: "40px 0", textAlign: "center" }}>
-        <div style={{ fontSize: "13px", color: "#A3A3A3" }}>No posts yet. Updates from your community will appear here.</div>
-      </div>
-    );
-  }
-
-  const tabStyle = (active: boolean): React.CSSProperties => ({
-    padding: "4px 12px",
-    borderRadius: "6px",
-    fontSize: "11px",
-    fontWeight: 600,
-    cursor: "pointer",
-    border: "none",
-    background: active ? "#0F0F0F" : "transparent",
-    color: active ? "#FFFFFF" : "#A3A3A3",
-    letterSpacing: "0.02em",
+  const typeTabStyle = (active: boolean): React.CSSProperties => ({
+    display: "inline-flex", alignItems: "center", gap: "6px",
+    padding: "8px 0",
+    fontSize: "13px", fontWeight: 600,
+    cursor: "pointer", border: "none", background: "none",
+    color: active ? "#0F0F0F" : "#A3A3A3",
+    borderBottom: active ? "2px solid #FF4F1A" : "2px solid transparent",
+    transition: "color 0.15s ease",
+    marginRight: "20px",
   });
 
   return (
     <div>
-      {/* Sort tabs */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
+      {/* Inline compose */}
+      <div style={{ marginBottom: "16px" }}>
+        <InlineCompose role={userRole} groups={groups} />
+      </div>
+
+      {/* Post type filter tabs */}
+      <div style={{
+        display: "flex", alignItems: "center",
+        borderBottom: "1px solid #EAEAE8",
+        marginBottom: "16px",
+      }}>
+        <button style={typeTabStyle(typeFilter === "all")} onClick={() => setTypeFilter("all")}>
+          All
+        </button>
+        <button style={typeTabStyle(typeFilter === "announcement")} onClick={() => setTypeFilter("announcement")}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={typeFilter === "announcement" ? "#FF4F1A" : "#A3A3A3"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0" /></svg>
+          Announcements
+        </button>
+        <button style={typeTabStyle(typeFilter === "discussion")} onClick={() => setTypeFilter("discussion")}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={typeFilter === "discussion" ? "#FF4F1A" : "#A3A3A3"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+          Discussions
+        </button>
+        <button style={typeTabStyle(typeFilter === "question")} onClick={() => setTypeFilter("question")}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={typeFilter === "question" ? "#FF4F1A" : "#A3A3A3"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+          Questions
+        </button>
+
+        {/* Sort toggle — right side */}
+        <div style={{ marginLeft: "auto", display: "flex", gap: "2px", background: "#F5F5F4", borderRadius: "8px", padding: "2px" }}>
+          {(["recent", "active"] as const).map((s) => (
+            <button
+              key={s}
+              onClick={() => setSort(s)}
+              style={{
+                padding: "4px 10px", borderRadius: "6px",
+                fontSize: "11px", fontWeight: 600, cursor: "pointer", border: "none",
+                background: sort === s ? "#FFFFFF" : "transparent",
+                color: sort === s ? "#0F0F0F" : "#A3A3A3",
+                boxShadow: sort === s ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              {s === "recent" ? "Recent" : "Active"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Feed cards */}
+      {ordered.length === 0 ? (
         <div style={{
-          fontSize: "11px", fontFamily: "var(--font-syne)", fontWeight: 600,
-          textTransform: "uppercase", letterSpacing: "0.1em", color: "#A3A3A3",
+          background: "#FFFFFF", border: "none", boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)", borderRadius: "14px",
+          padding: "48px 24px", textAlign: "center",
         }}>
-          Feed
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D0D0D0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: "12px" }}>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <div style={{ fontSize: "14px", fontWeight: 600, color: "#6E6E6E", marginBottom: "4px" }}>
+            {typeFilter === "all" ? "No posts yet" : `No ${typeFilter}s yet`}
+          </div>
+          <div style={{ fontSize: "13px", color: "#A3A3A3" }}>
+            {typeFilter === "all" ? "Be the first to start a conversation." : "Try a different filter or create one above."}
+          </div>
         </div>
-        <div style={{ display: "flex", gap: "2px", background: "#F5F5F4", borderRadius: "8px", padding: "2px" }}>
-          <button style={tabStyle(sort === "recent")} onClick={() => setSort("recent")}>Recent</button>
-          <button style={tabStyle(sort === "active")} onClick={() => setSort("active")}>Active</button>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {ordered.map((p) => (
+            <FeedCard key={p.id} post={p} currentUserId={currentUserId} isAdmin={isAdmin} />
+          ))}
         </div>
-      </div>
+      )}
 
-      {/* Feed items */}
-      <div>
-        {ordered.map((p) => (
-          <FeedItem key={p.id} post={p} currentUserId={currentUserId} />
-        ))}
-      </div>
-
-      <div style={{ textAlign: "center", paddingTop: "12px" }}>
-        <Link
-          href="/announcements"
-          style={{
-            fontSize: "12px", fontWeight: 600, color: "#FF4F1A",
-            textDecoration: "none",
-          }}
-        >
-          View all posts &rarr;
-        </Link>
-      </div>
+      {/* Load more could go here in the future */}
     </div>
   );
 }

@@ -66,7 +66,7 @@ export default function PostCard({ post, animationDelay = 0 }: PostCardProps) {
         {post.is_pinned && (
           <span style={{
             fontSize: "10px", fontFamily: "var(--font-syne)", fontWeight: 600,
-            letterSpacing: "0.06em", padding: "2px 8px", borderRadius: "20px",
+            letterSpacing: "0.06em", padding: "2px 8px", borderRadius: "10px",
             background: "rgba(255,79,26,0.10)", color: "#FF4F1A", textTransform: "uppercase",
           }}>
             Pinned
@@ -74,7 +74,7 @@ export default function PostCard({ post, animationDelay = 0 }: PostCardProps) {
         )}
         <span style={{
           fontSize: "10px", fontFamily: "var(--font-syne)", fontWeight: 600,
-          letterSpacing: "0.06em", padding: "2px 8px", borderRadius: "20px",
+          letterSpacing: "0.06em", padding: "2px 8px", borderRadius: "10px",
           background: typeStyle.bg, color: typeStyle.color, textTransform: "uppercase",
         }}>
           {typeStyle.label}
@@ -82,7 +82,7 @@ export default function PostCard({ post, animationDelay = 0 }: PostCardProps) {
         {post.is_global ? (
           <span style={{
             fontSize: "10px", fontFamily: "var(--font-syne)", fontWeight: 600,
-            letterSpacing: "0.06em", padding: "2px 8px", borderRadius: "20px",
+            letterSpacing: "0.06em", padding: "2px 8px", borderRadius: "10px",
             background: "rgba(59,130,246,0.08)", color: "#3B82F6", textTransform: "uppercase",
           }}>
             Everyone
@@ -91,7 +91,7 @@ export default function PostCard({ post, animationDelay = 0 }: PostCardProps) {
           post.groups.map((g, i) => (
             <span key={i} style={{
               fontSize: "10px", fontFamily: "var(--font-syne)", fontWeight: 600,
-              letterSpacing: "0.06em", padding: "2px 8px", borderRadius: "20px",
+              letterSpacing: "0.06em", padding: "2px 8px", borderRadius: "10px",
               background: "#F0F0F0", color: "#6E6E6E", textTransform: "uppercase",
             }}>
               {g.name}
