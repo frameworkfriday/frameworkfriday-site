@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "./NotificationBell";
+import BottomTabBar from "./BottomTabBar";
 
 const NAV = [
   {
@@ -607,6 +608,8 @@ export default function Sidebar({ userEmail, userName, avatarUrl, isAdmin, isFac
         </div>
       </div>
     </aside>
+    {/* Bottom tab bar for mobile */}
+    <BottomTabBar onMorePress={() => setMobileOpen(true)} />
     </>
   );
 }

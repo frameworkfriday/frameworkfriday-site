@@ -7,10 +7,16 @@ export default async function OnboardingPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Load existing profile data
+  // Load existing profile data (may have been pre-filled by admin)
   const { data: profile } = await supabase
     .from("profiles")
-    .select("first_name, last_name, business_name, role_title, linkedin_url, website_url")
+    .select(`
+      first_name, last_name, business_name, role_title,
+      linkedin_url, website_url, phone, bio, industry,
+      company_revenue_range, employee_count_range,
+      city, state, timezone, goals, referral_source,
+      birthday, spouse_partner_name
+    `)
     .eq("id", user.id)
     .single();
 
@@ -56,6 +62,18 @@ export default async function OnboardingPage() {
         roleTitle: profile?.role_title ?? "",
         linkedinUrl: profile?.linkedin_url ?? "",
         websiteUrl: profile?.website_url ?? "",
+        phone: profile?.phone ?? "",
+        bio: profile?.bio ?? "",
+        industry: profile?.industry ?? "",
+        revenueRange: profile?.company_revenue_range ?? "",
+        employeeRange: profile?.employee_count_range ?? "",
+        city: profile?.city ?? "",
+        state: profile?.state ?? "",
+        timezone: profile?.timezone ?? "",
+        goals: profile?.goals ?? "",
+        referralSource: profile?.referral_source ?? "",
+        birthday: profile?.birthday ?? "",
+        spousePartnerName: profile?.spouse_partner_name ?? "",
       }}
       groupName={groupName}
       memberCount={memberCount ?? null}

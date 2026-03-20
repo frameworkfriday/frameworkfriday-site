@@ -6,16 +6,29 @@ export default async function AdminMemberDetailPage({ params }: { params: Promis
   const { id } = await params;
   const admin = createAdminClient();
 
-  const [{ data: profile }, { data: adminRoles }, { data: memberships }, { data: groups }] =
+  const [{ data: profile }, { data: adminRoles }, { data: memberships }, { data: groups }, { data: auditLogs }] =
     await Promise.all([
       admin
         .from("profiles")
-        .select("id, first_name, last_name, email, business_name, role_title, avatar_url, linkedin_url, website_url, community_visible, archived_at, created_at, onboarding_completed_at, onboarding_path")
+        .select(`
+          id, first_name, last_name, email, business_name, role_title,
+          avatar_url, linkedin_url, website_url, community_visible,
+          archived_at, created_at, onboarding_completed_at, onboarding_path,
+          phone, address_line1, address_line2, city, state, zip, country, timezone,
+          bio, industry, company_revenue_range, employee_count_range,
+          birthday, spouse_partner_name, goals, referral_source
+        `)
         .eq("id", id)
         .single(),
       admin.from("user_roles").select("user_id").eq("user_id", id).eq("role", "admin"),
       admin.from("forum_group_members").select("forum_group_id, role, forum_groups(id, name)").eq("user_id", id),
       admin.from("forum_groups").select("id, name").order("name"),
+      admin
+        .from("member_audit_log")
+        .select("id, action, details, performed_by, created_at")
+        .eq("member_id", id)
+        .order("created_at", { ascending: false })
+        .limit(50),
     ]);
 
   if (!profile) notFound();
@@ -36,6 +49,7 @@ export default async function AdminMemberDetailPage({ params }: { params: Promis
       isAdmin={isAdmin}
       memberGroups={memberGroups}
       allGroups={groups ?? []}
+      auditLogs={auditLogs ?? []}
     />
   );
 }
