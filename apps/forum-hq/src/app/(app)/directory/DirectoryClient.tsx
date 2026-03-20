@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Profile {
   id: string;
@@ -110,10 +111,11 @@ export default function DirectoryClient({ profiles, currentUserId, userGroups }:
             const isYou = profile.id === currentUserId;
 
             return (
-              <div
+              <Link
+                href={`/directory/${profile.id}`}
                 key={profile.id}
                 className={`card card-hover animate-fade-up delay-${Math.min(idx + 1, 6)}`}
-                style={{ padding: "18px" }}
+                style={{ padding: "18px", textDecoration: "none", color: "inherit", display: "block" }}
               >
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
                   {profile.avatar_url ? (
@@ -242,7 +244,7 @@ export default function DirectoryClient({ profiles, currentUserId, userGroups }:
                     {/* Message button */}
                     {!isYou && (
                       <button
-                        onClick={() => router.push(`/messages?to=${profile.id}`)}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/messages?to=${profile.id}`); }}
                         style={{
                           display: "inline-flex", alignItems: "center", gap: "6px",
                           marginTop: "10px", padding: "6px 14px", borderRadius: "8px",
@@ -270,7 +272,7 @@ export default function DirectoryClient({ profiles, currentUserId, userGroups }:
                     )}
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
