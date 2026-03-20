@@ -147,23 +147,27 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         }}
       >
         <div style={{ display: "flex", alignItems: "flex-start", gap: "20px" }}>
-          {/* Date block */}
+          {/* Date block — Apple Calendar style */}
           <div
             style={{
               width: "64px",
+              height: "64px",
               flexShrink: 0,
               textAlign: "center",
-              padding: "12px 8px",
               borderRadius: "14px",
-              background: isPast ? "#F7F7F6" : type.bg,
-              border: `1px solid ${isPast ? "#E5E5E5" : "transparent"}`,
+              background: isPast ? "#F7F7F6" : "#FFFFFF",
+              border: `1px solid ${isPast ? "#E5E5E5" : "#EAEAE8"}`,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <div style={{ fontSize: "26px", fontFamily: "var(--font-syne)", fontWeight: 800, color: isPast ? "#A3A3A3" : type.color, lineHeight: 1 }}>
-              {d.getDate()}
+            <div style={{ fontSize: "11px", fontWeight: 700, color: isPast ? "#A3A3A3" : "#FF4F1A", textTransform: "uppercase", letterSpacing: "0.06em", lineHeight: 1, marginBottom: "2px" }}>
+              {d.toLocaleDateString("en-US", { month: "short" })}
             </div>
-            <div style={{ fontSize: "11px", color: isPast ? "#A3A3A3" : type.color, fontWeight: 600, letterSpacing: "0.05em", marginTop: "3px" }}>
-              {d.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
+            <div style={{ fontSize: "24px", fontWeight: 700, color: isPast ? "#A3A3A3" : "#0F0F0F", lineHeight: 1 }}>
+              {d.getDate()}
             </div>
           </div>
 
@@ -394,7 +398,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                 </div>
               )}
               <Link
-                href="/forum"
+                href="/"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",

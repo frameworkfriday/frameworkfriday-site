@@ -284,23 +284,27 @@ function SessionRow({
     >
       {/* Top row: date + info + delete */}
       <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-        {/* Date block */}
+        {/* Date block — Apple Calendar style */}
         <div
           style={{
             width: "44px",
+            height: "44px",
             flexShrink: 0,
             textAlign: "center",
-            padding: "6px",
             borderRadius: "10px",
-            background: past ? "#F7F7F6" : type.bg,
-            border: `1px solid ${past ? "#E5E5E5" : "transparent"}`,
+            background: past ? "#F7F7F6" : "#FFFFFF",
+            border: `1px solid ${past ? "#E5E5E5" : "#EAEAE8"}`,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <div style={{ fontSize: "17px", fontFamily: "var(--font-syne)", fontWeight: 800, color: past ? "#A3A3A3" : type.color, lineHeight: 1 }}>
-            {new Date(session.starts_at).getDate()}
+          <div style={{ fontSize: "9px", fontWeight: 700, color: past ? "#A3A3A3" : "#FF4F1A", textTransform: "uppercase", letterSpacing: "0.06em", lineHeight: 1, marginBottom: "1px" }}>
+            {new Date(session.starts_at).toLocaleDateString("en-US", { month: "short" })}
           </div>
-          <div style={{ fontSize: "9px", color: past ? "#A3A3A3" : type.color, fontWeight: 600, letterSpacing: "0.05em" }}>
-            {new Date(session.starts_at).toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
+          <div style={{ fontSize: "17px", fontWeight: 700, color: past ? "#A3A3A3" : "#0F0F0F", lineHeight: 1 }}>
+            {new Date(session.starts_at).getDate()}
           </div>
         </div>
 
