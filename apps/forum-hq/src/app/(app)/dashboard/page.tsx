@@ -94,6 +94,7 @@ export default async function DashboardPage() {
     feedPosts,
     { data: memberProfiles },
     { data: resources },
+    { data: unreadNotifs },
   ] = await Promise.all([
     // Next upcoming sessions (get 2)
     groupId
@@ -274,6 +275,13 @@ export default async function DashboardPage() {
       .select("id, category, title, description, url")
       .order("position")
       .limit(4),
+
+    // Unread notification count
+    admin
+      .from("notifications")
+      .select("id")
+      .eq("recipient_id", user.id)
+      .is("read_at", null),
   ]);
 
   type MemberProfile = {
@@ -292,6 +300,7 @@ export default async function DashboardPage() {
 
   const nextSession = nextSessions?.[0] ?? null;
   const groupColor = group?.badge_color || "#FF4F1A";
+  const unreadCount = unreadNotifs?.length ?? 0;
   const fullName = profile ? `${profile.first_name} ${profile.last_name ?? ""}`.trim() : "Member";
   const userInitials = fullName.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase();
 
@@ -404,6 +413,33 @@ export default async function DashboardPage() {
                 </p>
               )}
             </div>
+
+            {/* Notification bell */}
+            <Link href="/notifications" style={{
+              position: "relative",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: "40px", height: "40px", borderRadius: "10px",
+              textDecoration: "none", color: "#6E6E6E", flexShrink: 0,
+              background: unreadCount > 0 ? "#FFF3EE" : "transparent",
+              transition: "background 0.15s ease",
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {unreadCount > 0 && (
+                <div style={{
+                  position: "absolute", top: "6px", right: "6px",
+                  width: unreadCount > 9 ? "16px" : "8px",
+                  height: unreadCount > 9 ? "16px" : "8px",
+                  borderRadius: "50%",
+                  background: "#FF4F1A",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "9px", fontWeight: 700, color: "#FFFFFF",
+                }}>
+                  {unreadCount > 9 ? `${unreadCount}` : ""}
+                </div>
+              )}
+            </Link>
           </div>
 
           {/* Session row */}
