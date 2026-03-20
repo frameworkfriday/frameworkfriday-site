@@ -33,9 +33,13 @@ export default async function SessionsPage() {
     ? await admin
         .from("sessions")
         .select("id, title, description, starts_at, duration_minutes, video_call_url, session_type, forum_group_id, google_event_id, forum_groups(name)")
-        .in("forum_group_id", groupIds)
+        .or(`forum_group_id.in.(${groupIds.join(",")}),forum_group_id.is.null`)
         .order("starts_at")
-    : { data: [] };
+    : await admin
+        .from("sessions")
+        .select("id, title, description, starts_at, duration_minutes, video_call_url, session_type, forum_group_id, google_event_id, forum_groups(name)")
+        .is("forum_group_id", null)
+        .order("starts_at");
 
   // Flatten group name into each session
   const sessionsWithGroup = (sessions ?? []).map((s) => ({

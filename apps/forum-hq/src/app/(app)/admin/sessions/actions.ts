@@ -31,6 +31,8 @@ export async function createSession(formData: FormData) {
     const { data: group } = await admin.from("forum_groups").select("name").eq("id", forum_group_id).single();
     const typeLabel = SESSION_TYPE_LABELS[session_type] ?? "Session";
     title = group ? `${group.name} — ${typeLabel}` : typeLabel;
+  } else if (!title && !forum_group_id && session_type === "office_hours") {
+    title = "Framework Friday — Office Hours";
   } else if (!title) {
     title = SESSION_TYPE_LABELS[session_type] ?? "Session";
   }
@@ -112,6 +114,31 @@ export async function bulkCreateSessions(formData: FormData) {
 
   if (!title || !starts_at || !session_type || !groupIdsRaw) return;
 
+  const hasOwnUrl = !!video_call_url?.trim();
+
+  // Cross-group mode: create a single session with no group
+  if (groupIdsRaw === "cross_group") {
+    const typeLabel = SESSION_TYPE_LABELS[session_type] ?? "Session";
+    let sessionTitle = title
+      .replace(/\{group\}/gi, "Framework Friday")
+      .replace(/\{type\}/gi, typeLabel);
+
+    const sessionData = {
+      title: sessionTitle.trim(),
+      description: description?.trim() || null,
+      session_type,
+      forum_group_id: null,
+      starts_at: new Date(starts_at).toISOString(),
+      duration_minutes,
+      video_call_url: video_call_url?.trim() || null,
+      facilitator_id: facilitator_id || null,
+    };
+
+    await admin.from("sessions").insert(sessionData).select("id").single();
+    revalidatePath("/admin/sessions");
+    return;
+  }
+
   let groupIds: string[];
 
   if (groupIdsRaw === "all") {
@@ -129,8 +156,6 @@ export async function bulkCreateSessions(formData: FormData) {
     .select("id, name")
     .in("id", groupIds);
   const groupNameMap = Object.fromEntries((groups ?? []).map((g) => [g.id, g.name]));
-
-  const hasOwnUrl = !!video_call_url?.trim();
 
   for (const groupId of groupIds) {
     const groupName = groupNameMap[groupId] ?? "";

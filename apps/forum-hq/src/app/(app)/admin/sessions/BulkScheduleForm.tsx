@@ -17,6 +17,8 @@ const SESSION_TYPES = [
 export default function BulkScheduleForm({ groups, profiles }: Props) {
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
   const [allSelected, setAllSelected] = useState(false);
+  const [crossGroup, setCrossGroup] = useState(false);
+  const [sessionType, setSessionType] = useState("forum_session");
   const [showUrl, setShowUrl] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,7 +44,7 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
     setSelectedGroups(next);
   };
 
-  const count = selectedGroups.size;
+  const count = crossGroup ? 1 : selectedGroups.size;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -51,13 +53,15 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
 
     const form = e.currentTarget;
     const fd = new FormData(form);
-    fd.set("group_ids", allSelected ? "all" : Array.from(selectedGroups).join(","));
+    fd.set("group_ids", crossGroup ? "cross_group" : allSelected ? "all" : Array.from(selectedGroups).join(","));
 
     await bulkCreateSessions(fd);
     setSubmitting(false);
     form.reset();
     setSelectedGroups(new Set());
     setAllSelected(false);
+    setCrossGroup(false);
+    setSessionType("forum_session");
     setShowUrl(false);
   };
 
@@ -126,7 +130,22 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
           </div>
           <div>
             <label style={labelStyle}>Type *</label>
-            <select name="session_type" required style={{ ...inputStyle, appearance: "none" }}>
+            <select
+              name="session_type"
+              required
+              value={sessionType}
+              onChange={(e) => {
+                setSessionType(e.target.value);
+                if (e.target.value === "office_hours") {
+                  setCrossGroup(true);
+                  setSelectedGroups(new Set());
+                  setAllSelected(false);
+                } else {
+                  setCrossGroup(false);
+                }
+              }}
+              style={{ ...inputStyle, appearance: "none" }}
+            >
               {SESSION_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>{t.label}</option>
               ))}
@@ -195,6 +214,77 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
         {/* Group selection */}
         <div style={{ marginBottom: "20px" }}>
           <label style={labelStyle}>Apply to Groups *</label>
+
+          {/* Cross-group mode for office hours */}
+          {sessionType === "office_hours" && (
+            <div style={{
+              border: "1.5px solid #E5E5E5", borderRadius: "10px", overflow: "hidden", marginBottom: "8px",
+            }}>
+              <div
+                onClick={() => {
+                  setCrossGroup(true);
+                  setSelectedGroups(new Set());
+                  setAllSelected(false);
+                }}
+                style={{
+                  display: "flex", alignItems: "center", gap: "10px",
+                  padding: "10px 14px", cursor: "pointer",
+                  background: crossGroup ? "rgba(255,79,26,0.04)" : "#FAFAF9",
+                  borderBottom: "1px solid #E5E5E5",
+                }}
+              >
+                <div style={{
+                  width: "18px", height: "18px", borderRadius: "14px",
+                  border: `2px solid ${crossGroup ? "#FF4F1A" : "#D4D4D4"}`,
+                  background: crossGroup ? "#FF4F1A" : "transparent",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all 0.15s", flexShrink: 0,
+                }}>
+                  {crossGroup && (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </div>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "#0F0F0F" }}>
+                  All Members (cross-group)
+                </span>
+                <span style={{ fontSize: "11px", color: "#6E6E6E", marginLeft: "auto" }}>
+                  Single session, no group
+                </span>
+              </div>
+              <div
+                onClick={() => {
+                  setCrossGroup(false);
+                }}
+                style={{
+                  display: "flex", alignItems: "center", gap: "10px",
+                  padding: "10px 14px", cursor: "pointer",
+                  background: !crossGroup ? "rgba(255,79,26,0.04)" : "transparent",
+                }}
+              >
+                <div style={{
+                  width: "18px", height: "18px", borderRadius: "14px",
+                  border: `2px solid ${!crossGroup ? "#FF4F1A" : "#D4D4D4"}`,
+                  background: !crossGroup ? "#FF4F1A" : "transparent",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all 0.15s", flexShrink: 0,
+                }}>
+                  {!crossGroup && (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </div>
+                <span style={{ fontSize: "13px", fontWeight: 500, color: "#0F0F0F" }}>
+                  Per-group (one session per group)
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Per-group selection (hidden when cross-group is selected) */}
+          {(!crossGroup || sessionType !== "office_hours") && (
           <div style={{
             border: "1.5px solid #E5E5E5", borderRadius: "10px", overflow: "hidden",
           }}>
@@ -260,6 +350,7 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
               );
             })}
           </div>
+          )}
         </div>
 
         <button

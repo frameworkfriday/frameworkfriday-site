@@ -96,16 +96,22 @@ export default async function DashboardPage() {
     { data: resources },
     { data: unreadNotifs },
   ] = await Promise.all([
-    // Next upcoming sessions (get 2)
+    // Next upcoming sessions (get 2) — include cross-group sessions (forum_group_id IS NULL)
     groupId
       ? admin
           .from("sessions")
-          .select("id, title, description, starts_at, duration_minutes, video_call_url, session_type, google_event_id")
-          .eq("forum_group_id", groupId)
+          .select("id, title, description, starts_at, duration_minutes, video_call_url, session_type, google_event_id, forum_group_id")
+          .or(`forum_group_id.eq.${groupId},forum_group_id.is.null`)
           .gte("starts_at", new Date().toISOString())
           .order("starts_at")
           .limit(2)
-      : Promise.resolve({ data: [] as { id: string; title: string; description: string | null; starts_at: string; duration_minutes: number; video_call_url: string | null; session_type: string; google_event_id: string | null }[] }),
+      : admin
+          .from("sessions")
+          .select("id, title, description, starts_at, duration_minutes, video_call_url, session_type, google_event_id, forum_group_id")
+          .is("forum_group_id", null)
+          .gte("starts_at", new Date().toISOString())
+          .order("starts_at")
+          .limit(2),
 
     // Recent posts with comments and reactions (group-scoped)
     (async () => {

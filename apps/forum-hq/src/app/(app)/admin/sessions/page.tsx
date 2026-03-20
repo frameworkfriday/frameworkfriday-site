@@ -62,7 +62,8 @@ export default async function AdminSessionsPage() {
   const allGroups = groups ?? [];
   const allProfiles = profiles ?? [];
 
-  const unassigned = allSessions.filter((s) => !s.forum_group_id);
+  const crossGroup = allSessions.filter((s) => !s.forum_group_id && s.session_type === "office_hours");
+  const unassigned = allSessions.filter((s) => !s.forum_group_id && s.session_type !== "office_hours");
   const assigned = allSessions.filter((s) => s.forum_group_id);
 
   return (
@@ -110,11 +111,14 @@ export default async function AdminSessionsPage() {
             <div>
               <label style={labelStyle}>Group</label>
               <select name="forum_group_id" style={{ ...inputStyle, appearance: "none" }}>
-                <option value="">Unassigned — schedule later</option>
+                <option value="">All Groups (cross-group)</option>
                 {allGroups.map((g) => (
                   <option key={g.id} value={g.id}>{g.name}</option>
                 ))}
               </select>
+              <div style={{ fontSize: "11px", color: "#A3A3A3", marginTop: "4px" }}>
+                Office Hours are visible to all Forum members
+              </div>
             </div>
           </div>
 
@@ -189,6 +193,20 @@ export default async function AdminSessionsPage() {
         <div className="card" style={{ padding: "48px 28px", textAlign: "center" }}>
           <div style={{ fontFamily: "var(--font-syne)", fontWeight: 600, fontSize: "15px", color: "#0F0F0F", marginBottom: "6px" }}>No sessions yet</div>
           <div style={{ fontSize: "13px", color: "#6E6E6E" }}>Use the form above to schedule your first session.</div>
+        </div>
+      )}
+
+      {/* Cross-group sessions (office hours visible to all) */}
+      {crossGroup.length > 0 && (
+        <div style={{ marginBottom: "32px" }}>
+          <div style={{ fontSize: "11px", fontFamily: "var(--font-syne)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "#6E6E6E", marginBottom: "10px" }}>
+            Cross-Group — visible to all members
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {crossGroup.map((session, idx) => (
+              <SessionRow key={session.id} session={session} groupMap={groupMap} allGroups={allGroups} allProfiles={allProfiles} profileMap={profileMap} idx={idx} />
+            ))}
+          </div>
         </div>
       )}
 

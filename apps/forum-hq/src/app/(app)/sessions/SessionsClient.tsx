@@ -120,14 +120,12 @@ function SessionCard({ session, idx = 0, rsvp }: { session: Session; idx?: numbe
         <div style={{ fontSize: "12px", color: "#A3A3A3", marginBottom: session.description || session.group_name ? "5px" : 0 }}>
           {formatDate(session.starts_at)} &middot; {formatTime(session.starts_at)} &middot; {session.duration_minutes} min
         </div>
-        {session.group_name && (
-          <div style={{ fontSize: "11px", color: "#A3A3A3", marginBottom: (session.description || rsvp) ? "4px" : 0, display: "flex", alignItems: "center", gap: "4px" }}>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-            </svg>
-            {session.group_name}
-          </div>
-        )}
+        <div style={{ fontSize: "11px", color: "#A3A3A3", marginBottom: (session.description || rsvp) ? "4px" : 0, display: "flex", alignItems: "center", gap: "4px" }}>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+          </svg>
+          {session.group_name ?? "All Members"}
+        </div>
         {/* RSVP avatar stack */}
         {rsvp && !past && (
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: session.description ? "4px" : 0 }}>

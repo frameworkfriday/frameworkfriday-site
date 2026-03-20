@@ -7,12 +7,18 @@ import Link from "next/link";
 
 const SESSION_TYPES = [
   { value: "forum_session", label: "Forum Session", color: "#FF4F1A", bg: "rgba(255,79,26,0.10)" },
+  { value: "ad_hoc",        label: "Ad Hoc",        color: "#3B82F6", bg: "rgba(59,130,246,0.10)" },
+];
+
+// All types for display (session list may include office_hours created by admin)
+const ALL_SESSION_TYPES = [
+  { value: "forum_session", label: "Forum Session", color: "#FF4F1A", bg: "rgba(255,79,26,0.10)" },
   { value: "office_hours",  label: "Office Hours",  color: "#6E6E6E", bg: "#F0F0F0" },
   { value: "ad_hoc",        label: "Ad Hoc",        color: "#3B82F6", bg: "rgba(59,130,246,0.10)" },
 ];
 
 function typeInfo(type: string) {
-  return SESSION_TYPES.find((t) => t.value === type) ?? SESSION_TYPES[0];
+  return ALL_SESSION_TYPES.find((t) => t.value === type) ?? ALL_SESSION_TYPES[0];
 }
 
 function formatDate(iso: string) {
