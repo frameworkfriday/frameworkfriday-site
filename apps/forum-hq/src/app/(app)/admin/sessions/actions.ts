@@ -7,9 +7,15 @@ import {
   cancelSessionCalendarEvent,
 } from "@/lib/google/sync";
 
+const SESSION_TYPE_LABELS: Record<string, string> = {
+  forum_session: "Forum Session",
+  office_hours: "Office Hours",
+  ad_hoc: "Session",
+};
+
 export async function createSession(formData: FormData) {
   const admin = createAdminClient();
-  const title = formData.get("title") as string;
+  let title = (formData.get("title") as string)?.trim() || "";
   const description = formData.get("description") as string;
   const session_type = formData.get("session_type") as string;
   const forum_group_id = formData.get("forum_group_id") as string;
@@ -18,10 +24,19 @@ export async function createSession(formData: FormData) {
   const video_call_url = formData.get("video_call_url") as string;
   const facilitator_id = formData.get("facilitator_id") as string;
 
-  if (!title || !starts_at || !session_type) return;
+  if (!starts_at || !session_type) return;
+
+  // Auto-generate title from group name + session type if not provided
+  if (!title && forum_group_id) {
+    const { data: group } = await admin.from("forum_groups").select("name").eq("id", forum_group_id).single();
+    const typeLabel = SESSION_TYPE_LABELS[session_type] ?? "Session";
+    title = group ? `${group.name} — ${typeLabel}` : typeLabel;
+  } else if (!title) {
+    title = SESSION_TYPE_LABELS[session_type] ?? "Session";
+  }
 
   const sessionData = {
-    title: title.trim(),
+    title,
     description: description?.trim() || null,
     session_type,
     forum_group_id: forum_group_id || null,
@@ -119,7 +134,10 @@ export async function bulkCreateSessions(formData: FormData) {
 
   for (const groupId of groupIds) {
     const groupName = groupNameMap[groupId] ?? "";
-    const sessionTitle = title.replace(/\{group\}/gi, groupName);
+    const typeLabel = SESSION_TYPE_LABELS[session_type] ?? "Session";
+    let sessionTitle = title
+      .replace(/\{group\}/gi, groupName)
+      .replace(/\{type\}/gi, typeLabel);
 
     const sessionData = {
       title: sessionTitle.trim(),

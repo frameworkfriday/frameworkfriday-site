@@ -121,8 +121,8 @@ export default function BulkScheduleForm({ groups, profiles }: Props) {
         {/* Session fields */}
         <div className="form-grid-3" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px", marginBottom: "14px" }}>
           <div>
-            <label style={labelStyle}>Title *</label>
-            <input name="title" type="text" required placeholder="Session 3 — {group}" style={inputStyle} />
+            <label style={labelStyle}>Title</label>
+            <input name="title" type="text" placeholder="{group} — {type}" defaultValue="{group} — {type}" style={inputStyle} />
           </div>
           <div>
             <label style={labelStyle}>Type *</label>
