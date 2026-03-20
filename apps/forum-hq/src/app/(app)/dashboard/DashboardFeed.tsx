@@ -749,10 +749,13 @@ export default function DashboardFeed({
       </div>
 
       {/* Post type filter tabs */}
-      <div style={{
+      <div className="feed-filter-row" style={{
         display: "flex", alignItems: "center",
         borderBottom: "1px solid #EAEAE8",
         marginBottom: "16px",
+        overflowX: "auto",
+        WebkitOverflowScrolling: "touch",
+        scrollbarWidth: "none",
       }}>
         <button style={typeTabStyle(typeFilter === "all")} onClick={() => setTypeFilter("all")}>
           All
