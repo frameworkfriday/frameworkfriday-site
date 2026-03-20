@@ -9,18 +9,8 @@ import NotificationBell from "./NotificationBell";
 
 const NAV = [
   {
-    label: "Dashboard",
+    label: "Home",
     href: "/",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-        <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-      </svg>
-    ),
-  },
-  {
-    label: "Your Forum",
-    href: "/forum",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -387,7 +377,7 @@ export default function Sidebar({ userEmail, userName, avatarUrl, isAdmin, isFac
               <span style={{ color: "inherit" }}>
                 {item.icon}
               </span>
-              {item.href === "/forum" ? (groupName ?? item.label) : item.label}
+              {item.href === "/" ? (groupName ?? item.label) : item.label}
             </Link>
           ))}
         </div>
